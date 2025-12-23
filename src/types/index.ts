@@ -4,3 +4,11 @@ export interface Option {
   icon?: React.ComponentType<{ className?: string }>;
   withCount?: boolean;
 }
+
+export interface Profile {
+  id: string;
+  username?: string;
+  email?: string;
+  created_at?: string;
+  updated_at?: string;
+}

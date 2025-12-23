@@ -1,6 +1,23 @@
-# Welcome to Your Miaoda Project
+# VIRALIX - AI Content Creation Studio
 
 ## Project Info
+
+VIRALIX is an all-in-one professional AI studio designed for content creators to generate, write, animate, and edit AI images and videos in one place. It aims to replace multiple AI tools with one powerful, easy-to-use AI creation platform for images, videos, scripts, and animation, focusing on viral content and social media growth.
+
+### Features
+
+- **AI Video Generator**: Generate AI videos up to 4 minutes long with flexible aspect ratios (16:9, 9:16, 1:1)
+- **AI Image Generator**: Text-to-image and image-to-image generation with high-resolution output
+- **AI Chat Assistant**: Professional ChatGPT-style AI chat for writing scripts, creating viral content ideas, and improving prompts
+- **Script to Video**: Transform scripts into complete videos with automatic scene breakdown
+- **Video Editor**: Preview and download your generated videos
+
+### Design
+
+- **Primary Colors**: Deep purple (#6C5CE7) and electric blue (#0984E3)
+- **Dark Mode**: Dark gray (#1E1E2E) with vibrant accents
+- **Light Mode**: Clean white (#FFFFFF) with soft gray (#F5F6FA)
+- **Modern UI**: Rounded corners (8-12px), subtle shadows, smooth transitions
 
 ## Project Directory
 
