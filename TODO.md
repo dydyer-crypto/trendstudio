@@ -92,6 +92,20 @@
   - [x] Add header with logo to HomePage
   - [x] Translate HomePage content to French
 
+- [x] Step 11: Affiliate Program Implementation
+  - [x] Design database schema for affiliate tracking
+  - [x] Add referral_code field to profiles table
+  - [x] Create referrals table to track referrals
+  - [x] Generate unique referral codes for users
+  - [x] Implement referral tracking on signup
+  - [x] Create affiliate dashboard page
+  - [x] Add reward system (50 credits for successful referrals)
+  - [x] Display referral stats and earnings
+  - [x] Add referral link sharing functionality
+  - [x] Update AuthContext to handle referral codes
+  - [x] Add referral bonus indicator on login page
+  - [x] Add Affiliation route to navigation
+
 ## Notes
 - First registered user becomes admin automatically
 - Stripe secret key must be configured by user after deployment
@@ -107,3 +121,8 @@
 - AI generation features (video, image, chat) are properly configured and ready to use
 - Enhanced logo with gradient background, shadow effects, and French tagline visible in top left on all pages including HomePage
 - HomePage now has a sticky header with TrendStudio logo and navigation buttons
+- Affiliate program implemented with automatic referral tracking and rewards
+- Users earn 50 credits for each successful referral
+- Referral codes are automatically generated for all users
+- Referral links can be shared via the Affiliation page
+- Signup with referral code shows bonus indicator and credits both users

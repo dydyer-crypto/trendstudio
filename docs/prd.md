@@ -1,12 +1,12 @@
-# TrendStudio Requirements Document
+# VIRALIX Requirements Document
 
 ## 1. Application Overview
 
 ### 1.1 Application Name
-TrendStudio
+VIRALIX
 
 ### 1.2 Application Description
-TrendStudio is an all-in-one professional AI studio designed for content creators to generate, write, animate, and edit AI images and videos in one place. It aims to replace multiple AI tools with one powerful, easy-to-use AI creation platform for images, videos, scripts, and animation, focusing on viral content and social media growth.
+VIRALIX is an all-in-one professional AI studio designed for content creators to generate, write, animate, and edit AI images and videos in one place. It aims to replace multiple AI tools with one powerful, easy-to-use AI creation platform for images, videos, scripts, and animation, focusing on viral content and social media growth.
 
 ### 1.3 Target Users
 Both beginners and professional content creators who need to produce viral content for social media platforms.
@@ -62,9 +62,14 @@ Both beginners and professional content creators who need to produce viral conte
 
 ### 2.7 Payment Integration
 - Stripe payment gateway integration
-- Connect Stripe account functionality for payment processing
-- Support for subscription plans and one-time purchases
+- Connect Stripe account functionality for payment processing\n- Support for subscription plans and one-time purchases
 - Secure payment processing for premium features
+\n### 2.8 Affiliate Program
+- Referral system allowing users to earn commissions by promoting VIRALIX
+- Unique affiliate links for each user
+- Commission tracking dashboard
+- Automated payout system
+- Marketing materials and resources for affiliates
 
 ## 3. General Requirements
 
@@ -92,7 +97,7 @@ Both beginners and professional content creators who need to produce viral conte
 - Icon style: Line-based with consistent stroke width\n
 ### 4.3 Layout
 - Card-based layout for feature modules
-- Sidebar navigation for main sections (Video Generator, Image Generator, AI Chat, Editor)
+- Sidebar navigation for main sections (Video Generator, Image Generator, AI Chat, Editor, Affiliate Program)
 - Responsive grid system for content display
 - Timeline-based interface for video editing section
 - Clean spacing with focus on content creation area

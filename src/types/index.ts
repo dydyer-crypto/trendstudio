@@ -13,8 +13,23 @@ export interface Profile {
   email?: string;
   role: UserRole;
   credits: number;
+  referral_code?: string;
+  referred_by?: string;
+  referral_earnings?: number;
   created_at?: string;
   updated_at?: string;
+}
+
+export type ReferralStatus = 'pending' | 'completed' | 'credited';
+
+export interface Referral {
+  id: string;
+  referrer_id: string;
+  referred_id: string;
+  status: ReferralStatus;
+  reward_amount: number;
+  created_at: string;
+  completed_at?: string;
 }
 
 export type OrderStatus = 'pending' | 'completed' | 'cancelled' | 'refunded';

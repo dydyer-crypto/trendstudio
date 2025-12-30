@@ -21,7 +21,7 @@ interface AuthContextType {
   profile: Profile | null;
   loading: boolean;
   signIn: (username: string, password: string) => Promise<{ error: Error | null }>;
-  signUp: (username: string, password: string) => Promise<{ error: Error | null }>;
+  signUp: (username: string, password: string, referralCode?: string) => Promise<{ error: Error | null }>;
   signOut: () => Promise<void>;
   refreshProfile: () => Promise<void>;
 }
@@ -79,13 +79,24 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   };
 
-  const signUpWithUsername = async (username: string, password: string) => {
+  const signUpWithUsername = async (username: string, password: string, referralCode?: string) => {
     try {
       const email = `${username}@miaoda.com`;
-      const { error } = await supabase.auth.signUp({
+      const options: any = {
         email,
         password,
-      });
+      };
+      
+      // Add referral code to user metadata if provided
+      if (referralCode) {
+        options.options = {
+          data: {
+            referral_code: referralCode,
+          },
+        };
+      }
+      
+      const { error } = await supabase.auth.signUp(options);
 
       if (error) throw error;
       return { error: null };

@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+import { useNavigate, useLocation, useSearchParams } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -7,12 +7,14 @@ import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { toast } from 'sonner';
-import { Sparkles } from 'lucide-react';
+import { Sparkles, Gift } from 'lucide-react';
 
 export default function LoginPage() {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
+  const [searchParams] = useSearchParams();
+  const referralCode = searchParams.get('ref');
   const { signIn, signUp } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
@@ -63,13 +65,17 @@ export default function LoginPage() {
     }
 
     setLoading(true);
-    const { error } = await signUp(username, password);
+    const { error } = await signUp(username, password, referralCode || undefined);
     setLoading(false);
 
     if (error) {
       toast.error(error.message || 'Échec de l\'inscription');
     } else {
-      toast.success('Inscription réussie ! Vous pouvez maintenant vous connecter.');
+      if (referralCode) {
+        toast.success('Inscription réussie ! Vous avez reçu des crédits bonus de parrainage !');
+      } else {
+        toast.success('Inscription réussie ! Vous pouvez maintenant vous connecter.');
+      }
       navigate(from, { replace: true });
     }
   };
@@ -87,6 +93,19 @@ export default function LoginPage() {
           </CardDescription>
         </CardHeader>
         <CardContent>
+          {referralCode && (
+            <div className="mb-6 p-4 bg-primary/10 border border-primary/20 rounded-lg">
+              <div className="flex items-start gap-3">
+                <Gift className="w-5 h-5 text-primary shrink-0 mt-0.5" />
+                <div className="space-y-1">
+                  <p className="font-medium text-sm">Bonus de parrainage activé !</p>
+                  <p className="text-xs text-muted-foreground">
+                    Inscrivez-vous maintenant et recevez 100 crédits gratuits + bonus de parrainage
+                  </p>
+                </div>
+              </div>
+            </div>
+          )}
           <Tabs defaultValue="login" className="w-full">
             <TabsList className="grid w-full grid-cols-2 mb-6">
               <TabsTrigger value="login">Connexion</TabsTrigger>
