@@ -159,7 +159,7 @@ export const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
               <div className="w-10 h-10 rounded-lg gradient-primary flex items-center justify-center">
                 <Sparkles className="w-6 h-6 text-white" />
               </div>
-              <span className="text-2xl font-bold gradient-text">VIRALIX</span>
+              <span className="text-2xl font-bold gradient-text">TrendStudio</span>
             </Link>
           </div>
 
@@ -202,7 +202,7 @@ export const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
               <div className="w-8 h-8 rounded-lg gradient-primary flex items-center justify-center">
                 <Sparkles className="w-5 h-5 text-white" />
               </div>
-              <span className="text-xl font-bold gradient-text">VIRALIX</span>
+              <span className="text-xl font-bold gradient-text">TrendStudio</span>
             </Link>
 
             <div className="flex items-center gap-2">
@@ -233,7 +233,7 @@ export const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
                         <div className="w-10 h-10 rounded-lg gradient-primary flex items-center justify-center">
                           <Sparkles className="w-6 h-6 text-white" />
                         </div>
-                        <span className="text-2xl font-bold gradient-text">VIRALIX</span>
+                        <span className="text-2xl font-bold gradient-text">TrendStudio</span>
                       </Link>
                     </div>
                     <div className="flex-1 p-4 overflow-y-auto">

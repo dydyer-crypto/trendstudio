@@ -1,4 +1,4 @@
-// API service for VIRALIX AI integrations
+// API service for TrendStudio AI integrations
 const APP_ID = import.meta.env.VITE_APP_ID || 'app-8l72dx9ovd34';
 
 // Common headers for all API requests

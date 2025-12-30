@@ -142,7 +142,7 @@ const HomePage: React.FC = () => {
             Ready to Create Viral Content?
           </h2>
           <p className="text-lg text-muted-foreground">
-            Join content creators using VIRALIX to produce professional AI-generated videos and images
+            Join content creators using TrendStudio to produce professional AI-generated videos and images
           </p>
           <div className="flex flex-col xl:flex-row items-center justify-center gap-4 pt-4">
             <Link to="/video-generator">

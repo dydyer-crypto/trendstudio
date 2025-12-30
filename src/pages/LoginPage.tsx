@@ -80,7 +80,7 @@ export default function LoginPage() {
         <CardHeader className="space-y-1 text-center pb-6">
           <div className="flex items-center justify-center gap-2 mb-2">
             <Sparkles className="h-6 w-6 xl:h-8 xl:w-8 text-primary" />
-            <CardTitle className="text-2xl xl:text-3xl font-bold gradient-text">VIRALIX</CardTitle>
+            <CardTitle className="text-2xl xl:text-3xl font-bold gradient-text">TrendStudio</CardTitle>
           </div>
           <CardDescription className="text-sm xl:text-base">
             Sign in to access your AI content creation studio

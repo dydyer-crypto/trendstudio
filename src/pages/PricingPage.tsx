@@ -162,7 +162,7 @@ export default function PricingPage() {
             </CardHeader>
             <CardContent className="space-y-4">
               <p className="text-sm xl:text-base text-muted-foreground">
-                AI Credits are used to power all AI features in VIRALIX. Each generation consumes credits based on complexity:
+                AI Credits are used to power all AI features in TrendStudio. Each generation consumes credits based on complexity:
               </p>
               <ul className="space-y-2">
                 <li className="flex items-start gap-2 text-sm xl:text-base">

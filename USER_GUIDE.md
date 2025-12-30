@@ -1,4 +1,4 @@
-# VIRALIX User Guide
+# TrendStudio User Guide
 
 ## Getting Started
 
@@ -207,4 +207,4 @@ For issues or questions:
 - Focus on aesthetic and visual appeal
 - High-quality images work best
 
-Enjoy creating viral content with VIRALIX! 🚀
+Enjoy creating viral content with TrendStudio! 🚀

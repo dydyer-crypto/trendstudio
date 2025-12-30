@@ -1,8 +1,8 @@
-# VIRALIX - AI Content Creation Studio
+# TrendStudio - AI Content Creation Studio
 
 ## Project Info
 
-VIRALIX is an all-in-one professional AI studio designed for content creators to generate, write, animate, and edit AI images and videos in one place. It aims to replace multiple AI tools with one powerful, easy-to-use AI creation platform for images, videos, scripts, and animation, focusing on viral content and social media growth.
+TrendStudio is an all-in-one professional AI studio designed for content creators to generate, write, animate, and edit AI images and videos in one place. It aims to replace multiple AI tools with one powerful, easy-to-use AI creation platform for images, videos, scripts, and animation, focusing on viral content and social media growth.
 
 ### Features
 

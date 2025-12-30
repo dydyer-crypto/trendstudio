@@ -1,12 +1,12 @@
-# VIRALIX Requirements Document
+# TrendStudio Requirements Document
 
 ## 1. Application Overview
 
 ### 1.1 Application Name
-VIRALIX
+TrendStudio
 
 ### 1.2 Application Description
-VIRALIX is an all-in-one professional AI studio designed for content creators to generate, write, animate, and edit AI images and videos in one place. It aims to replace multiple AI tools with one powerful, easy-to-use AI creation platform for images, videos, scripts, and animation, focusing on viral content and social media growth.
+TrendStudio is an all-in-one professional AI studio designed for content creators to generate, write, animate, and edit AI images and videos in one place. It aims to replace multiple AI tools with one powerful, easy-to-use AI creation platform for images, videos, scripts, and animation, focusing on viral content and social media growth.
 
 ### 1.3 Target Users
 Both beginners and professional content creators who need to produce viral content for social media platforms.
