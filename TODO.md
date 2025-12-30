@@ -145,6 +145,20 @@
   - [x] Display aggregate statistics across all content
   - [x] Show platform-specific performance comparison
 
+- [x] Step 15: Interactive Onboarding Tutorials (French UI)
+  - [x] Design database schema for tutorial progress tracking
+  - [x] Create tutorial system with step-by-step guidance
+  - [x] Implement 5 critical tutorials for main features
+  - [x] Add visual highlights and tooltips
+  - [x] Create progress tracking and completion system
+  - [x] Add micro-rewards (badges, congratulations)
+  - [x] Implement skip/restart functionality
+  - [x] Add tutorial management page
+  - [x] Ensure mobile-friendly interactions
+  - [x] Add TutorialOverlay component with positioning
+  - [x] Create tutorials data file with all tutorial definitions
+  - [x] Add Tutoriels route to navigation
+
 ## Notes
 - First registered user becomes admin automatically
 - Stripe secret key must be configured by user after deployment
@@ -187,3 +201,13 @@
 - Platform breakdown showing performance comparison across channels
 - Engagement rates and conversion metrics calculated automatically
 - Mock performance data for demonstration (can be connected to real social media APIs)
+- Interactive tutorial system with 5 comprehensive onboarding guides (French UI)
+- Tutorials cover: creating videos, generating images, scheduling content, discovering trends, using chat assistant
+- Each tutorial has 5 steps with contextual guidance and tips
+- Visual highlights and element targeting for guided interactions
+- Progress tracking stored in database with completion status
+- Badge rewards system for completing tutorials
+- Skip and restart functionality for flexible learning
+- Tutorial overlay with smart positioning (top, bottom, left, right, center)
+- Progress bar showing overall tutorial completion
+- Non-intrusive design that doesn't block application functionality

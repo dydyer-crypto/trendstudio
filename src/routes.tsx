@@ -12,6 +12,7 @@ import AffiliatePage from './pages/AffiliatePage';
 import CalendarPage from './pages/CalendarPage';
 import TrendsPage from './pages/TrendsPage';
 import AnalyticsPage from './pages/AnalyticsPage';
+import TutorialsPage from './pages/TutorialsPage';
 import type { ReactNode } from 'react';
 
 interface RouteConfig {
@@ -76,6 +77,11 @@ const routes: RouteConfig[] = [
     name: 'Analytics',
     path: '/analytics',
     element: <AnalyticsPage />
+  },
+  {
+    name: 'Tutoriels',
+    path: '/tutorials',
+    element: <TutorialsPage />
   },
   {
     name: 'Login',

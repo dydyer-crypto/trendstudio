@@ -91,36 +91,73 @@ Both beginners and professional content creators who need to produce viral conte
 - Suivi des indicateurs clés : vues, likes, partages, commentaires, taux d'engagement
 - Graphiques d'évolution des performances dans le temps
 - Comparaison des performances entre différents contenus
-- Analyse par plateforme (YouTube, TikTok, Instagram, Facebook)\n- Identification des contenus les plus performants\n- Rapports exportables en PDF ou CSV
-- Suggestions d'amélioration basées sur les données de performance
+- Analyse par plateforme (YouTube, TikTok, Instagram, Facebook)\n- Identification des contenus les plus performants
+- Rapports exportables en PDF ou CSV\n- Suggestions d'amélioration basées sur les données de performance
+
+### 2.12 Système de Tutoriels Interactifs
+\n#### 2.12.1 Objectif Principal
+- Réduire la courbe d'apprentissage des nouveaux utilisateurs
+- Augmenter le taux d'activation en offrant une prise en main intuitive et valorisante
+- Guider les utilisateurs novices sans nécessiter de support externe
+\n#### 2.12.2 Structure des Tutoriels
+- Modules courts et indépendants, chacun centré sur une tâche spécifique
+- Chaque module suit trois étapes :
+  1. Contextualisation Brève : Expliquer l'utilité de la fonctionnalité
+  2. Interaction Guidée : L'utilisateur effectue l'action avec indications visuelles (surlignages, flèches, numéros)
+  3. Confirmation et Suivi : Validation de la réussite et proposition d'enchaînement logique
+\n#### 2.12.3 Tutoriels Critiques (3-5 premiers modules)
+- Tutoriel 1 : Créer votre première vidéo AI
+- Tutoriel 2 : Générer votre première image AI
+- Tutoriel 3 : Utiliser l'assistant AI Chat pour écrire un script
+- Tutoriel 4 : Transformer un script en vidéo complète
+- Tutoriel 5 : Publier et planifier votre contenu
+\n#### 2.12.4 Éléments Interactifs
+- Surbrillances et zones cliquables très visibles pour guider les actions
+- Microrécompenses : badges, messages de félicitations, barres de progression
+- Conseils proactifs contextuels\n- Chemin personnalisable : possibilité de sauter un tutoriel et y revenir plus tard
+- Liste complète des guides disponibles accessible à tout moment
+
+#### 2.12.5 Contenu et Ton
+- Langage simple, clair et bienveillant
+- Ton encourageant et positif\n- Instructions concises placées à proximité immédiate des éléments d'interface
+- Éviter le jargon technique
+
+#### 2.12.6 Spécifications Techniques
+- Intégration non intrusive dans l'interface existante
+- Système de gestion pour désactiver les tutoriels après complétion
+- Option de réactivation dans les paramètres
+- Adaptation parfaite aux appareils mobiles avec support des gestes tactiles
+- Sauvegarde de la progression de l'utilisateur
 
 ## 3. General Requirements
-
-### 3.1 User Interface\n- Simple, fast, and creator-friendly UI
+\n### 3.1 User Interface
+- Simple, fast, and creator-friendly UI
 - Modern design with dark/light mode support
 
 ### 3.2 Language Support
 - Arabic and English language support
 
 ### 3.3 Access Type
-- Public app (open for everyone)\n
+- Public app (open for everyone)
+
 ### 3.4 User Experience
-- Designed for both beginners and professional creators\n- Focus on ease of use and efficiency
+- Designed for both beginners and professional creators
+- Focus on ease of use and efficiency
 
 ## 4. Design Style
-
-### 4.1 Color Scheme
-- Primary colors: Deep purple (#6C5CE7) and electric blue (#0984E3) for a modern, creative tech feel\n- Dark mode: Dark gray background (#1E1E2E) with vibrant accent colors
-- Light mode: Clean white background (#FFFFFF) with soft gray elements (#F5F6FA)
+\n### 4.1 Color Scheme
+- Primary colors: Deep purple (#6C5CE7) and electric blue (#0984E3) for a modern, creative tech feel
+- Dark mode: Dark gray background (#1E1E2E) with vibrant accent colors\n- Light mode: Clean white background (#FFFFFF) with soft gray elements (#F5F6FA)
 
 ### 4.2 Visual Details
-- Rounded corners (8-12px) for cards and buttons to create a friendly, modern look\n- Subtle shadows and depth layers for visual hierarchy
+- Rounded corners (8-12px) for cards and buttons to create a friendly, modern look
+- Subtle shadows and depth layers for visual hierarchy
 - Gradient accents on primary action buttons
 - Smooth transitions and micro-animations for interactions
-- Icon style: Line-based with consistent stroke width\n
+- Icon style: Line-based with consistent stroke width
+
 ### 4.3 Layout
 - Card-based layout for feature modules
-- Sidebar navigation for main sections (Video Generator, Image Generator, AI Chat, Editor, Affiliate Program, Publication Calendar, Trend Analysis, Performance Statistics)
+- Sidebar navigation for main sections (Video Generator, Image Generator, AI Chat, Editor, Affiliate Program, Publication Calendar, Trend Analysis, Performance Statistics, Interactive Tutorials)
 - Responsive grid system for content display
-- Timeline-based interface for video editing section
-- Clean spacing with focus on content creation area
+- Timeline-based interface for video editing section\n- Clean spacing with focus on content creation area

@@ -91,3 +91,53 @@ export interface ScheduledPost {
   created_at: string;
   updated_at: string;
 }
+
+export type TutorialStatus = 'not_started' | 'in_progress' | 'completed' | 'skipped';
+
+export interface TutorialProgress {
+  id: string;
+  user_id: string;
+  tutorial_id: string;
+  status: TutorialStatus;
+  current_step: number;
+  completed_steps: number[];
+  started_at?: string;
+  completed_at?: string;
+  last_interaction_at: string;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface TutorialBadge {
+  id: string;
+  user_id: string;
+  badge_id: string;
+  badge_name: string;
+  badge_description?: string;
+  earned_at: string;
+}
+
+export interface TutorialStep {
+  step: number;
+  title: string;
+  description: string;
+  target?: string; // CSS selector for element to highlight
+  position?: 'top' | 'bottom' | 'left' | 'right' | 'center';
+  action?: 'click' | 'input' | 'navigate' | 'observe';
+  tip?: string;
+}
+
+export interface Tutorial {
+  id: string;
+  title: string;
+  description: string;
+  icon: string;
+  category: string;
+  estimatedTime: number; // in minutes
+  steps: TutorialStep[];
+  badge?: {
+    id: string;
+    name: string;
+    description: string;
+  };
+}
