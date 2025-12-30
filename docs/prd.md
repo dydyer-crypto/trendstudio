@@ -73,40 +73,46 @@ Both beginners and professional content creators who need to produce viral conte
 - Schedule and plan content publication across multiple social media platforms
 - Calendar view displaying scheduled posts by date and time
 - Drag-and-drop functionality to reschedule posts
-- Multi-platform support (YouTube, TikTok, Instagram, Facebook)\n- Post preview before scheduling
+- Multi-platform support (YouTube, TikTok, Instagram, Facebook)
+- Post preview before scheduling
 - Automatic publishing at scheduled times
 - Status tracking (draft, scheduled, published)
 - Bulk scheduling for multiple posts
 
+### 2.10 Real-Time Trend Analysis
+- Monitor trending topics and hashtags across social media platforms in real-time
+- Display trending content categories and viral themes
+- Suggest content ideas based on current trends
+- Track performance metrics of trending content
+- Filter trends by platform, region, and content type
+- Provide insights on optimal posting times based on trend data
+
 ## 3. General Requirements
 
-### 3.1 User Interface
-- Simple, fast, and creator-friendly UI
+### 3.1 User Interface\n- Simple, fast, and creator-friendly UI
 - Modern design with dark/light mode support
 
 ### 3.2 Language Support
 - Arabic and English language support
-\n### 3.3 Access Type
-- Public app (open for everyone)
 
+### 3.3 Access Type
+- Public app (open for everyone)\n
 ### 3.4 User Experience
-- Designed for both beginners and professional creators
-- Focus on ease of use and efficiency
+- Designed for both beginners and professional creators\n- Focus on ease of use and efficiency
 
 ## 4. Design Style
 
 ### 4.1 Color Scheme
-- Primary colors: Deep purple (#6C5CE7) and electric blue (#0984E3) for a modern, creative tech feel
-- Dark mode: Dark gray background (#1E1E2E) with vibrant accent colors
-- Light mode: Clean white background (#FFFFFF) with soft gray elements (#F5F6FA)\n
+- Primary colors: Deep purple (#6C5CE7) and electric blue (#0984E3) for a modern, creative tech feel\n- Dark mode: Dark gray background (#1E1E2E) with vibrant accent colors
+- Light mode: Clean white background (#FFFFFF) with soft gray elements (#F5F6FA)
+
 ### 4.2 Visual Details
-- Rounded corners (8-12px) for cards and buttons to create a friendly, modern look
-- Subtle shadows and depth layers for visual hierarchy
+- Rounded corners (8-12px) for cards and buttons to create a friendly, modern look\n- Subtle shadows and depth layers for visual hierarchy
 - Gradient accents on primary action buttons
 - Smooth transitions and micro-animations for interactions
-- Icon style: Line-based with consistent stroke width
-
+- Icon style: Line-based with consistent stroke width\n
 ### 4.3 Layout
-- Card-based layout for feature modules\n- Sidebar navigation for main sections (Video Generator, Image Generator, AI Chat, Editor, Affiliate Program, Publication Calendar)
+- Card-based layout for feature modules
+- Sidebar navigation for main sections (Video Generator, Image Generator, AI Chat, Editor, Affiliate Program, Publication Calendar, Trend Analysis)
 - Responsive grid system for content display
 - Timeline-based interface for video editing section\n- Clean spacing with focus on content creation area

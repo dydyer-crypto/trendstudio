@@ -10,6 +10,7 @@ import PaymentSuccessPage from './pages/PaymentSuccessPage';
 import OrderHistoryPage from './pages/OrderHistoryPage';
 import AffiliatePage from './pages/AffiliatePage';
 import CalendarPage from './pages/CalendarPage';
+import TrendsPage from './pages/TrendsPage';
 import type { ReactNode } from 'react';
 
 interface RouteConfig {
@@ -64,6 +65,11 @@ const routes: RouteConfig[] = [
     name: 'Calendrier',
     path: '/calendar',
     element: <CalendarPage />
+  },
+  {
+    name: 'Tendances',
+    path: '/trends',
+    element: <TrendsPage />
   },
   {
     name: 'Login',
