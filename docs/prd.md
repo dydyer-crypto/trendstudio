@@ -82,10 +82,17 @@ Both beginners and professional content creators who need to produce viral conte
 ### 2.10 Real-Time Trend Analysis
 - Monitor trending topics and hashtags across social media platforms in real-time
 - Display trending content categories and viral themes
-- Suggest content ideas based on current trends
-- Track performance metrics of trending content
+- Suggest content ideas based on current trends\n- Track performance metrics of trending content
 - Filter trends by platform, region, and content type
 - Provide insights on optimal posting times based on trend data
+
+### 2.11 Statistiques de Performance des Contenus
+- Tableau de bord analytique affichant les métriques de performance pour chaque contenu publié
+- Suivi des indicateurs clés : vues, likes, partages, commentaires, taux d'engagement
+- Graphiques d'évolution des performances dans le temps
+- Comparaison des performances entre différents contenus
+- Analyse par plateforme (YouTube, TikTok, Instagram, Facebook)\n- Identification des contenus les plus performants\n- Rapports exportables en PDF ou CSV
+- Suggestions d'amélioration basées sur les données de performance
 
 ## 3. General Requirements
 
@@ -113,6 +120,7 @@ Both beginners and professional content creators who need to produce viral conte
 - Icon style: Line-based with consistent stroke width\n
 ### 4.3 Layout
 - Card-based layout for feature modules
-- Sidebar navigation for main sections (Video Generator, Image Generator, AI Chat, Editor, Affiliate Program, Publication Calendar, Trend Analysis)
+- Sidebar navigation for main sections (Video Generator, Image Generator, AI Chat, Editor, Affiliate Program, Publication Calendar, Trend Analysis, Performance Statistics)
 - Responsive grid system for content display
-- Timeline-based interface for video editing section\n- Clean spacing with focus on content creation area
+- Timeline-based interface for video editing section
+- Clean spacing with focus on content creation area
