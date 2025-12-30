@@ -44,15 +44,15 @@ const VideoGeneratorPage: React.FC = () => {
           if (response.data.task_result?.videos?.[0]) {
             setGeneratedVideo(response.data.task_result.videos[0]);
             toast({
-              title: 'Video Generated Successfully! 🎉',
-              description: 'Your AI video is ready to download.',
+              title: 'Vidéo générée avec succès ! 🎉',
+              description: 'Votre vidéo IA est prête à être téléchargée.',
             });
           }
         } else if (response.data.task_status === 'failed') {
           setIsGenerating(false);
           toast({
-            title: 'Video Generation Failed',
-            description: response.data.task_status_msg || 'Please try again with a different prompt.',
+            title: 'Échec de la génération vidéo',
+            description: response.data.task_status_msg || 'Veuillez réessayer avec un prompt différent.',
             variant: 'destructive',
           });
         } else if (response.data.task_status === 'processing' || response.data.task_status === 'submitted') {
@@ -65,8 +65,8 @@ const VideoGeneratorPage: React.FC = () => {
           } else {
             setIsGenerating(false);
             toast({
-              title: 'Generation Timeout',
-              description: 'Video generation is taking longer than expected. Please check back later.',
+              title: 'Délai de génération dépassé',
+              description: 'La génération vidéo prend plus de temps que prévu. Veuillez revenir plus tard.',
               variant: 'destructive',
             });
           }
@@ -75,7 +75,7 @@ const VideoGeneratorPage: React.FC = () => {
         setIsGenerating(false);
         toast({
           title: 'Error',
-          description: error instanceof Error ? error.message : 'Failed to check video status',
+          description: error instanceof Error ? error.message : 'Échec de la vérification du statut de la vidéo',
           variant: 'destructive',
         });
       }
@@ -87,8 +87,8 @@ const VideoGeneratorPage: React.FC = () => {
   const handleGenerate = async () => {
     if (!prompt.trim()) {
       toast({
-        title: 'Prompt Required',
-        description: 'Please enter a prompt to generate your video.',
+        title: 'Prompt requis',
+        description: 'Veuillez entrer un prompt pour générer votre vidéo.',
         variant: 'destructive',
       });
       return;
@@ -115,8 +115,8 @@ const VideoGeneratorPage: React.FC = () => {
       setProgress(10);
       
       toast({
-        title: 'Video Generation Started',
-        description: 'Your video is being generated. This may take up to 10 minutes.',
+        title: 'Génération vidéo démarrée',
+        description: 'Votre vidéo est en cours de génération. Cela peut prendre jusqu\'à 10 minutes.',
       });
 
       // Start polling for status
@@ -124,8 +124,8 @@ const VideoGeneratorPage: React.FC = () => {
     } catch (error) {
       setIsGenerating(false);
       toast({
-        title: 'Generation Failed',
-        description: error instanceof Error ? error.message : 'Failed to start video generation',
+        title: 'Échec de la génération',
+        description: error instanceof Error ? error.message : 'Échec du démarrage de la génération vidéo',
         variant: 'destructive',
       });
     }

@@ -123,8 +123,8 @@ const ChatAssistantPage: React.FC = () => {
     setCopiedIndex(index);
     setTimeout(() => setCopiedIndex(null), 2000);
     toast({
-      title: 'Copied to Clipboard',
-      description: 'Message content copied successfully',
+      title: 'Copié dans le presse-papiers',
+      description: 'Contenu du message copié avec succès',
     });
   };
 

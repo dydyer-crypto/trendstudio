@@ -72,8 +72,8 @@ const ImageGeneratorPage: React.FC = () => {
   const handleGenerate = async () => {
     if (!prompt.trim()) {
       toast({
-        title: 'Prompt Required',
-        description: 'Please enter a prompt to generate your image.',
+        title: 'Prompt requis',
+        description: 'Veuillez entrer un prompt pour générer votre image.',
         variant: 'destructive',
       });
       return;
@@ -127,8 +127,8 @@ const ImageGeneratorPage: React.FC = () => {
         if (base64Image) {
           setGeneratedImage(`data:image/png;base64,${base64Image}`);
           toast({
-            title: 'Image Generated Successfully! 🎨',
-            description: 'Your AI image is ready to download.',
+            title: 'Image générée avec succès ! 🎨',
+            description: 'Votre image IA est prête à être téléchargée.',
           });
         } else {
           throw new Error('Failed to extract image from response');
@@ -138,8 +138,8 @@ const ImageGeneratorPage: React.FC = () => {
       }
     } catch (error) {
       toast({
-        title: 'Generation Failed',
-        description: error instanceof Error ? error.message : 'Failed to generate image',
+        title: 'Échec de la génération',
+        description: error instanceof Error ? error.message : 'Échec de la génération de l\'image',
         variant: 'destructive',
       });
     } finally {
@@ -281,7 +281,7 @@ const ImageGeneratorPage: React.FC = () => {
               {isGenerating ? (
                 <>
                   <Loader2 className="w-5 h-5 mr-2 animate-spin" />
-                  Generating Image...
+                  Génération de l'image en cours...
                 </>
               ) : (
                 <>
@@ -292,7 +292,7 @@ const ImageGeneratorPage: React.FC = () => {
             </Button>
             {isGenerating && (
               <p className="text-xs text-muted-foreground text-center">
-                This may take up to 5 minutes...
+                Cela peut prendre jusqu'à 5 minutes...
               </p>
             )}
           </CardContent>
