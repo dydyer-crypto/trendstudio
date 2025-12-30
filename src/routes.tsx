@@ -9,6 +9,7 @@ import PricingPage from './pages/PricingPage';
 import PaymentSuccessPage from './pages/PaymentSuccessPage';
 import OrderHistoryPage from './pages/OrderHistoryPage';
 import AffiliatePage from './pages/AffiliatePage';
+import CalendarPage from './pages/CalendarPage';
 import type { ReactNode } from 'react';
 
 interface RouteConfig {
@@ -58,6 +59,11 @@ const routes: RouteConfig[] = [
     name: 'Affiliation',
     path: '/affiliate',
     element: <AffiliatePage />
+  },
+  {
+    name: 'Calendrier',
+    path: '/calendar',
+    element: <CalendarPage />
   },
   {
     name: 'Login',

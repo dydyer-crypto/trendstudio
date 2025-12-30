@@ -69,3 +69,25 @@ export interface Product {
   created_at: string;
   updated_at: string;
 }
+
+export type PostStatus = 'draft' | 'scheduled' | 'published' | 'cancelled';
+export type SocialPlatform = 'youtube' | 'instagram' | 'tiktok' | 'facebook' | 'twitter' | 'linkedin' | 'other';
+export type ContentType = 'video' | 'image' | 'text';
+
+export interface ScheduledPost {
+  id: string;
+  user_id: string;
+  title: string;
+  description?: string;
+  content_type?: ContentType;
+  platform: SocialPlatform;
+  status: PostStatus;
+  scheduled_date: string;
+  published_date?: string;
+  content_url?: string;
+  thumbnail_url?: string;
+  tags?: string[];
+  notes?: string;
+  created_at: string;
+  updated_at: string;
+}

@@ -66,38 +66,47 @@ Both beginners and professional content creators who need to produce viral conte
 - Secure payment processing for premium features
 \n### 2.8 Affiliate Program
 - Referral system allowing users to earn commissions by promoting VIRALIX
-- Unique affiliate links for each user
-- Commission tracking dashboard
+- Unique affiliate links for each user\n- Commission tracking dashboard
 - Automated payout system
-- Marketing materials and resources for affiliates
+- Marketing materials and resources for affiliates\n
+### 2.9 Publication Calendar
+- Schedule and plan content publication across multiple social media platforms
+- Calendar view displaying scheduled posts by date and time
+- Drag-and-drop functionality to reschedule posts
+- Multi-platform support (YouTube, TikTok, Instagram, Facebook)\n- Post preview before scheduling
+- Automatic publishing at scheduled times
+- Status tracking (draft, scheduled, published)
+- Bulk scheduling for multiple posts
 
 ## 3. General Requirements
 
-### 3.1 User Interface\n- Simple, fast, and creator-friendly UI
+### 3.1 User Interface
+- Simple, fast, and creator-friendly UI
 - Modern design with dark/light mode support
 
 ### 3.2 Language Support
 - Arabic and English language support
+\n### 3.3 Access Type
+- Public app (open for everyone)
 
-### 3.3 Access Type
-- Public app (open for everyone)\n
 ### 3.4 User Experience
-- Designed for both beginners and professional creators\n- Focus on ease of use and efficiency
+- Designed for both beginners and professional creators
+- Focus on ease of use and efficiency
 
 ## 4. Design Style
 
 ### 4.1 Color Scheme
-- Primary colors: Deep purple (#6C5CE7) and electric blue (#0984E3) for a modern, creative tech feel\n- Dark mode: Dark gray background (#1E1E2E) with vibrant accent colors
-- Light mode: Clean white background (#FFFFFF) with soft gray elements (#F5F6FA)
-
+- Primary colors: Deep purple (#6C5CE7) and electric blue (#0984E3) for a modern, creative tech feel
+- Dark mode: Dark gray background (#1E1E2E) with vibrant accent colors
+- Light mode: Clean white background (#FFFFFF) with soft gray elements (#F5F6FA)\n
 ### 4.2 Visual Details
-- Rounded corners (8-12px) for cards and buttons to create a friendly, modern look\n- Subtle shadows and depth layers for visual hierarchy
+- Rounded corners (8-12px) for cards and buttons to create a friendly, modern look
+- Subtle shadows and depth layers for visual hierarchy
 - Gradient accents on primary action buttons
 - Smooth transitions and micro-animations for interactions
-- Icon style: Line-based with consistent stroke width\n
+- Icon style: Line-based with consistent stroke width
+
 ### 4.3 Layout
-- Card-based layout for feature modules
-- Sidebar navigation for main sections (Video Generator, Image Generator, AI Chat, Editor, Affiliate Program)
+- Card-based layout for feature modules\n- Sidebar navigation for main sections (Video Generator, Image Generator, AI Chat, Editor, Affiliate Program, Publication Calendar)
 - Responsive grid system for content display
-- Timeline-based interface for video editing section
-- Clean spacing with focus on content creation area
+- Timeline-based interface for video editing section\n- Clean spacing with focus on content creation area

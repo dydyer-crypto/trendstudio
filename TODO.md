@@ -106,6 +106,19 @@
   - [x] Add referral bonus indicator on login page
   - [x] Add Affiliation route to navigation
 
+- [x] Step 12: Publication Calendar Implementation
+  - [x] Design database schema for scheduled posts
+  - [x] Create scheduled_posts table with status tracking
+  - [x] Build calendar view component
+  - [x] Add create/edit/delete post functionality
+  - [x] Implement month calendar view with navigation
+  - [x] Add platform selection (YouTube, Instagram, TikTok, etc.)
+  - [x] Display post status indicators
+  - [x] Add responsive design for mobile calendar
+  - [x] Add RLS policies for user data security
+  - [x] Implement date/time picker for scheduling
+  - [x] Add Calendrier route to navigation
+
 ## Notes
 - First registered user becomes admin automatically
 - Stripe secret key must be configured by user after deployment
@@ -126,3 +139,9 @@
 - Referral codes are automatically generated for all users
 - Referral links can be shared via the Affiliation page
 - Signup with referral code shows bonus indicator and credits both users
+- Publication calendar allows users to plan and schedule content
+- Calendar supports multiple platforms (YouTube, Instagram, TikTok, Facebook, Twitter, LinkedIn)
+- Posts can have different statuses (draft, scheduled, published, cancelled)
+- Calendar view shows monthly overview with all scheduled posts
+- Users can create, edit, and delete scheduled posts
+- Each post includes title, description, platform, date/time, and notes
