@@ -13,16 +13,17 @@ Both beginners and professional content creators who need to produce viral conte
 
 ## 2. Core Features
 
-### 2.1 AI Video Generator\n- Generate AI videos with flexible duration options:\n  - 1 minute (free)
+### 2.1 AI Video Generator\n- Generate AI videos with flexible duration options:
+  - 1 minute (free)
   - 2 minutes (free)
-  - 3 minutes (free)
-  - 4 minutes (free)\n- Special mode for YouTube Shorts (up to 60 seconds, vertical 9:16 aspect ratio)
+  - 3 minutes (free)\n  - 4 minutes (free)
+- Special mode for YouTube Shorts (up to 60 seconds, vertical 9:16 aspect ratio)
 - Video aspect ratio options:
   - 9:16 (Shorts / Reels / TikTok)
   - 16:9 (YouTube long videos)
 - High-quality cinematic output with smooth AI motion and animation
-\n### 2.2 AI Image Generator
-- Text-to-image generation
+
+### 2.2 AI Image Generator\n- Text-to-image generation
 - Image-to-image generation (optional image upload)
 - Advanced prompt input supporting 2000+ characters
 - Image size presets:
@@ -31,61 +32,64 @@ Both beginners and professional content creators who need to produce viral conte
   - 16:9
   - 4:5
 - High-resolution, realistic, cinematic image output
-
-### 2.3 Built-in AI Chat Assistant
+\n### 2.3 Built-in AI Chat Assistant
 - Professional ChatGPT-style AI chat integrated within the app
 - Assists users with:
-  - Writing video scripts\n  - Creating viral content ideas\n  - Improving prompts\n  - Generating image prompts
+  - Writing video scripts
+  - Creating viral content ideas
+  - Improving prompts
+  - Generating image prompts
   - Generating video prompts
   - Suggesting animations and scenes
-- Direct conversion of chat scripts into:
-  - Image prompts\n  - Video prompts
+- Direct conversion of chat scripts into:\n  - Image prompts
+  - Video prompts
   - Animated scenes
-\n### 2.4 Script to Video Workflow
-- User writes or generates a script using AI chat
-- AI automatically breaks the script into scenes
-- Each scene includes:
-  - Image prompt
+
+### 2.4 Script to Video Workflow
+- User writes or generates a script using AI chat\n- AI automatically breaks the script into scenes
+- Each scene includes:\n  - Image prompt
   - Video prompt
   - Motion/animation instructions
-- One-click generation of full video from script
-\n### 2.5 Prompt Enhancement Tools
-- Improve prompt button\n- Expand short ideas into professional prompts
-- Optimize prompts for viral content creation
+- One-click generation of full video from script\n
+### 2.5 Prompt Enhancement Tools
+- Improve prompt button
+- Expand short ideas into professional prompts\n- Optimize prompts for viral content creation
 
-### 2.6 Editing & Creator Tools\n- Simple professional editor
-- Timeline-based preview (basic)
+### 2.6 Editing & Creator Tools
+- Simple professional editor\n- Timeline-based preview (basic)
 - Easy regeneration per scene
 - Download and share final content
 
+### 2.7 Payment Integration
+- Stripe payment gateway integration
+- Connect Stripe account functionality for payment processing
+- Support for subscription plans and one-time purchases
+- Secure payment processing for premium features
+
 ## 3. General Requirements
 
-### 3.1 User Interface
-- Simple, fast, and creator-friendly UI
+### 3.1 User Interface\n- Simple, fast, and creator-friendly UI
 - Modern design with dark/light mode support
-\n### 3.2 Language Support
-- Arabic and English language support
-\n### 3.3 Access Type
-- Public app (open for everyone)
 
+### 3.2 Language Support
+- Arabic and English language support
+
+### 3.3 Access Type
+- Public app (open for everyone)\n
 ### 3.4 User Experience
-- Designed for both beginners and professional creators
-- Focus on ease of use and efficiency
+- Designed for both beginners and professional creators\n- Focus on ease of use and efficiency
 
 ## 4. Design Style
 
 ### 4.1 Color Scheme
-- Primary colors: Deep purple (#6C5CE7) and electric blue (#0984E3) for a modern, creative tech feel
-- Dark mode: Dark gray background (#1E1E2E) with vibrant accent colors
+- Primary colors: Deep purple (#6C5CE7) and electric blue (#0984E3) for a modern, creative tech feel\n- Dark mode: Dark gray background (#1E1E2E) with vibrant accent colors
 - Light mode: Clean white background (#FFFFFF) with soft gray elements (#F5F6FA)
 
 ### 4.2 Visual Details
-- Rounded corners (8-12px) for cards and buttons to create a friendly, modern look
-- Subtle shadows and depth layers for visual hierarchy
+- Rounded corners (8-12px) for cards and buttons to create a friendly, modern look\n- Subtle shadows and depth layers for visual hierarchy
 - Gradient accents on primary action buttons
 - Smooth transitions and micro-animations for interactions
-- Icon style: Line-based with consistent stroke width
-
+- Icon style: Line-based with consistent stroke width\n
 ### 4.3 Layout
 - Card-based layout for feature modules
 - Sidebar navigation for main sections (Video Generator, Image Generator, AI Chat, Editor)

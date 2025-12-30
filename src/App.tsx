@@ -5,14 +5,18 @@ import routes from './routes';
 
 import { AppLayout } from '@/components/layouts/AppLayout';
 import { Toaster } from '@/components/ui/toaster';
+import { AuthProvider } from '@/contexts/AuthContext';
+import { RouteGuard } from '@/components/common/RouteGuard';
+import { Toaster as SonnerToaster } from 'sonner';
 
 const AppContent: React.FC = () => {
   const location = useLocation();
   const isHomePage = location.pathname === '/';
+  const isLoginPage = location.pathname === '/login';
 
   return (
     <>
-      {isHomePage ? (
+      {isHomePage || isLoginPage ? (
         <div className="flex flex-col min-h-screen">
           <main className="flex-grow">
             <Routes>
@@ -42,6 +46,7 @@ const AppContent: React.FC = () => {
         </AppLayout>
       )}
       <Toaster />
+      <SonnerToaster position="top-center" richColors />
     </>
   );
 };
@@ -49,7 +54,11 @@ const AppContent: React.FC = () => {
 const App: React.FC = () => {
   return (
     <Router>
-      <AppContent />
+      <AuthProvider>
+        <RouteGuard>
+          <AppContent />
+        </RouteGuard>
+      </AuthProvider>
     </Router>
   );
 };

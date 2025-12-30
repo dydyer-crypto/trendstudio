@@ -4,6 +4,10 @@ import ImageGeneratorPage from './pages/ImageGeneratorPage';
 import ChatAssistantPage from './pages/ChatAssistantPage';
 import ScriptToVideoPage from './pages/ScriptToVideoPage';
 import VideoEditorPage from './pages/VideoEditorPage';
+import LoginPage from './pages/LoginPage';
+import PricingPage from './pages/PricingPage';
+import PaymentSuccessPage from './pages/PaymentSuccessPage';
+import OrderHistoryPage from './pages/OrderHistoryPage';
 import type { ReactNode } from 'react';
 
 interface RouteConfig {
@@ -43,6 +47,29 @@ const routes: RouteConfig[] = [
     name: 'Video Editor',
     path: '/video-editor',
     element: <VideoEditorPage />
+  },
+  {
+    name: 'Pricing',
+    path: '/pricing',
+    element: <PricingPage />
+  },
+  {
+    name: 'Login',
+    path: '/login',
+    element: <LoginPage />,
+    visible: false
+  },
+  {
+    name: 'Payment Success',
+    path: '/payment-success',
+    element: <PaymentSuccessPage />,
+    visible: false
+  },
+  {
+    name: 'Orders',
+    path: '/orders',
+    element: <OrderHistoryPage />,
+    visible: false
   }
 ];
 

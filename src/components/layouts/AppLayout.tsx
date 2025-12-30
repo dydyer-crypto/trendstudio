@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { 
   Video, 
   Image as ImageIcon, 
@@ -9,11 +9,26 @@ import {
   Menu,
   Moon,
   Sun,
-  Sparkles
+  Sparkles,
+  CreditCard,
+  ShoppingBag,
+  LogOut,
+  User,
+  LogIn
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
+import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
+import { useAuth } from '@/contexts/AuthContext';
 
 interface AppLayoutProps {
   children: React.ReactNode;
@@ -31,10 +46,13 @@ const navItems: NavItem[] = [
   { name: 'AI Chat Assistant', path: '/chat-assistant', icon: <MessageSquare className="w-5 h-5" /> },
   { name: 'Script to Video', path: '/script-to-video', icon: <FileText className="w-5 h-5" /> },
   { name: 'Video Editor', path: '/video-editor', icon: <Scissors className="w-5 h-5" /> },
+  { name: 'Pricing', path: '/pricing', icon: <CreditCard className="w-5 h-5" /> },
 ];
 
 export const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
   const location = useLocation();
+  const navigate = useNavigate();
+  const { user, profile, signOut } = useAuth();
   const [darkMode, setDarkMode] = useState(() => {
     if (typeof window !== 'undefined') {
       return document.documentElement.classList.contains('dark');
@@ -50,6 +68,11 @@ export const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
     } else {
       document.documentElement.classList.remove('dark');
     }
+  };
+
+  const handleSignOut = async () => {
+    await signOut();
+    navigate('/');
   };
 
   const NavContent = () => (
@@ -75,6 +98,56 @@ export const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
     </nav>
   );
 
+  const UserMenu = () => {
+    if (!user) {
+      return (
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={() => navigate('/login')}
+          className="w-full justify-start gap-2"
+        >
+          <LogIn className="w-4 h-4" />
+          <span>Sign In</span>
+        </Button>
+      );
+    }
+
+    return (
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <Button variant="outline" className="w-full justify-start gap-2">
+            <User className="w-4 h-4" />
+            <div className="flex-1 text-left">
+              <div className="text-sm font-medium">{profile?.username || 'User'}</div>
+              <div className="text-xs text-muted-foreground flex items-center gap-1">
+                <Sparkles className="w-3 h-3" />
+                {profile?.credits || 0} credits
+              </div>
+            </div>
+          </Button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent align="end" className="w-56">
+          <DropdownMenuLabel>My Account</DropdownMenuLabel>
+          <DropdownMenuSeparator />
+          <DropdownMenuItem onClick={() => navigate('/pricing')}>
+            <CreditCard className="w-4 h-4 mr-2" />
+            Buy Credits
+          </DropdownMenuItem>
+          <DropdownMenuItem onClick={() => navigate('/orders')}>
+            <ShoppingBag className="w-4 h-4 mr-2" />
+            Order History
+          </DropdownMenuItem>
+          <DropdownMenuSeparator />
+          <DropdownMenuItem onClick={handleSignOut}>
+            <LogOut className="w-4 h-4 mr-2" />
+            Sign Out
+          </DropdownMenuItem>
+        </DropdownMenuContent>
+      </DropdownMenu>
+    );
+  };
+
   return (
     <div className="flex min-h-screen w-full bg-background">
       {/* Desktop Sidebar */}
@@ -95,8 +168,9 @@ export const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
             <NavContent />
           </div>
 
-          {/* Dark Mode Toggle */}
-          <div className="p-4 border-t border-border">
+          {/* User Menu & Dark Mode Toggle */}
+          <div className="p-4 border-t border-border space-y-2">
+            <UserMenu />
             <Button
               variant="outline"
               size="sm"
@@ -132,6 +206,12 @@ export const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
             </Link>
 
             <div className="flex items-center gap-2">
+              {user && profile && (
+                <Badge variant="secondary" className="hidden sm:flex items-center gap-1">
+                  <Sparkles className="w-3 h-3" />
+                  {profile.credits}
+                </Badge>
+              )}
               <Button
                 variant="ghost"
                 size="icon"
@@ -158,6 +238,9 @@ export const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
                     </div>
                     <div className="flex-1 p-4 overflow-y-auto">
                       <NavContent />
+                    </div>
+                    <div className="p-4 border-t border-border">
+                      <UserMenu />
                     </div>
                   </div>
                 </SheetContent>

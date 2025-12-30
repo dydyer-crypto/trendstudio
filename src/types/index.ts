@@ -5,10 +5,52 @@ export interface Option {
   withCount?: boolean;
 }
 
+export type UserRole = 'user' | 'admin';
+
 export interface Profile {
   id: string;
   username?: string;
   email?: string;
+  role: UserRole;
+  credits: number;
   created_at?: string;
   updated_at?: string;
+}
+
+export type OrderStatus = 'pending' | 'completed' | 'cancelled' | 'refunded';
+
+export interface OrderItem {
+  name: string;
+  price: number;
+  quantity: number;
+  image_url?: string;
+}
+
+export interface Order {
+  id: string;
+  user_id: string;
+  items: OrderItem[];
+  total_amount: number;
+  currency: string;
+  status: OrderStatus;
+  stripe_session_id?: string;
+  stripe_payment_intent_id?: string;
+  customer_email?: string;
+  customer_name?: string;
+  completed_at?: string;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface Product {
+  id: string;
+  name: string;
+  description?: string;
+  credits: number;
+  price: number;
+  currency: string;
+  image_url?: string;
+  is_active: boolean;
+  created_at: string;
+  updated_at: string;
 }
