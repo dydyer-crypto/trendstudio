@@ -168,6 +168,7 @@
   - [x] Store language preference in localStorage
   - [x] Set French as default language with English fallback
   - [x] Add flag emojis for visual language identification
+  - [x] Fix authentication: disable email verification for instant signup/login
 
 ## Notes
 - First registered user becomes admin automatically
