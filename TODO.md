@@ -159,6 +159,16 @@
   - [x] Create tutorials data file with all tutorial definitions
   - [x] Add Tutoriels route to navigation
 
+- [x] Step 16: Multilingual Support (English & French)
+  - [x] Install and configure i18n library (i18next, react-i18next)
+  - [x] Create translation files for English and French
+  - [x] Implement i18n configuration with localStorage persistence
+  - [x] Add LanguageSwitcher component with dropdown menu
+  - [x] Integrate language switcher in desktop sidebar and mobile header
+  - [x] Store language preference in localStorage
+  - [x] Set French as default language with English fallback
+  - [x] Add flag emojis for visual language identification
+
 ## Notes
 - First registered user becomes admin automatically
 - Stripe secret key must be configured by user after deployment
@@ -211,3 +221,12 @@
 - Tutorial overlay with smart positioning (top, bottom, left, right, center)
 - Progress bar showing overall tutorial completion
 - Non-intrusive design that doesn't block application functionality
+- Multilingual support for English and French languages
+- i18next library integrated for internationalization
+- Language switcher in desktop sidebar and mobile header
+- Translation files organized by feature/page (common, nav, auth, home, tutorials, calendar, trends, affiliate, settings)
+- Language preference persisted in localStorage
+- French set as default language with English fallback
+- Flag emojis (🇫🇷 🇬🇧) for visual language identification
+- Toast notifications for language change confirmation
+- All UI elements ready for translation (translation keys defined)

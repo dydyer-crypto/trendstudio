@@ -29,6 +29,7 @@ import {
 import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
 import { useAuth } from '@/contexts/AuthContext';
+import { LanguageSwitcher } from '@/components/common/LanguageSwitcher';
 
 interface AppLayoutProps {
   children: React.ReactNode;
@@ -174,24 +175,27 @@ export const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
           {/* User Menu & Dark Mode Toggle */}
           <div className="p-4 border-t border-border space-y-2">
             <UserMenu />
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={toggleDarkMode}
-              className="w-full justify-start gap-2"
-            >
-              {darkMode ? (
-                <>
-                  <Sun className="w-4 h-4" />
-                  <span>Light Mode</span>
-                </>
-              ) : (
-                <>
-                  <Moon className="w-4 h-4" />
-                  <span>Dark Mode</span>
-                </>
-              )}
-            </Button>
+            <div className="flex gap-2">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={toggleDarkMode}
+                className="flex-1 justify-start gap-2"
+              >
+                {darkMode ? (
+                  <>
+                    <Sun className="w-4 h-4" />
+                    <span>Light Mode</span>
+                  </>
+                ) : (
+                  <>
+                    <Moon className="w-4 h-4" />
+                    <span>Dark Mode</span>
+                  </>
+                )}
+              </Button>
+              <LanguageSwitcher />
+            </div>
           </div>
         </div>
       </aside>
@@ -218,6 +222,7 @@ export const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
                   {profile.credits}
                 </Badge>
               )}
+              <LanguageSwitcher />
               <Button
                 variant="ghost"
                 size="icon"
