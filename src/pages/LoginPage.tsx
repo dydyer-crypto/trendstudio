@@ -77,18 +77,18 @@ export default function LoginPage() {
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-background via-background to-primary/5 p-4">
       <Card className="w-full max-w-md">
-        <CardHeader className="space-y-1 text-center">
+        <CardHeader className="space-y-1 text-center pb-6">
           <div className="flex items-center justify-center gap-2 mb-2">
-            <Sparkles className="h-8 w-8 text-primary" />
-            <CardTitle className="text-3xl font-bold gradient-text">VIRALIX</CardTitle>
+            <Sparkles className="h-6 w-6 xl:h-8 xl:w-8 text-primary" />
+            <CardTitle className="text-2xl xl:text-3xl font-bold gradient-text">VIRALIX</CardTitle>
           </div>
-          <CardDescription>
+          <CardDescription className="text-sm xl:text-base">
             Sign in to access your AI content creation studio
           </CardDescription>
         </CardHeader>
         <CardContent>
           <Tabs defaultValue="login" className="w-full">
-            <TabsList className="grid w-full grid-cols-2">
+            <TabsList className="grid w-full grid-cols-2 mb-6">
               <TabsTrigger value="login">Login</TabsTrigger>
               <TabsTrigger value="register">Register</TabsTrigger>
             </TabsList>
@@ -96,7 +96,7 @@ export default function LoginPage() {
             <TabsContent value="login">
               <form onSubmit={handleSignIn} className="space-y-4">
                 <div className="space-y-2">
-                  <Label htmlFor="login-username">Username</Label>
+                  <Label htmlFor="login-username" className="text-sm">Username</Label>
                   <Input
                     id="login-username"
                     type="text"
@@ -105,10 +105,11 @@ export default function LoginPage() {
                     onChange={(e) => setUsername(e.target.value)}
                     disabled={loading}
                     required
+                    className="text-sm xl:text-base"
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="login-password">Password</Label>
+                  <Label htmlFor="login-password" className="text-sm">Password</Label>
                   <Input
                     id="login-password"
                     type="password"
@@ -117,6 +118,7 @@ export default function LoginPage() {
                     onChange={(e) => setPassword(e.target.value)}
                     disabled={loading}
                     required
+                    className="text-sm xl:text-base"
                   />
                 </div>
                 <Button type="submit" className="w-full" disabled={loading}>
@@ -128,7 +130,7 @@ export default function LoginPage() {
             <TabsContent value="register">
               <form onSubmit={handleSignUp} className="space-y-4">
                 <div className="space-y-2">
-                  <Label htmlFor="register-username">Username</Label>
+                  <Label htmlFor="register-username" className="text-sm">Username</Label>
                   <Input
                     id="register-username"
                     type="text"
@@ -137,13 +139,14 @@ export default function LoginPage() {
                     onChange={(e) => setUsername(e.target.value)}
                     disabled={loading}
                     required
+                    className="text-sm xl:text-base"
                   />
                   <p className="text-xs text-muted-foreground">
                     Only letters, numbers, and underscores allowed
                   </p>
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="register-password">Password</Label>
+                  <Label htmlFor="register-password" className="text-sm">Password</Label>
                   <Input
                     id="register-password"
                     type="password"
@@ -152,6 +155,7 @@ export default function LoginPage() {
                     onChange={(e) => setPassword(e.target.value)}
                     disabled={loading}
                     required
+                    className="text-sm xl:text-base"
                   />
                 </div>
                 <Button type="submit" className="w-full" disabled={loading}>
@@ -161,7 +165,7 @@ export default function LoginPage() {
             </TabsContent>
           </Tabs>
         </CardContent>
-        <CardFooter className="flex flex-col space-y-2 text-center text-sm text-muted-foreground">
+        <CardFooter className="flex flex-col space-y-2 text-center text-xs xl:text-sm text-muted-foreground">
           <p>Get 100 free credits when you sign up!</p>
         </CardFooter>
       </Card>

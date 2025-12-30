@@ -72,19 +72,19 @@ export default function PricingPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-background to-primary/5">
-      <div className="container mx-auto px-4 py-12">
-        <div className="text-center mb-12">
+      <div className="container mx-auto px-4 py-8 xl:py-12">
+        <div className="text-center mb-8 xl:mb-12">
           <div className="flex items-center justify-center gap-2 mb-4">
-            <Sparkles className="h-8 w-8 text-primary" />
-            <h1 className="text-4xl font-bold gradient-text">Choose Your Plan</h1>
+            <Sparkles className="h-6 h-6 xl:h-8 xl:w-8 text-primary" />
+            <h1 className="text-3xl xl:text-4xl font-bold gradient-text">Choose Your Plan</h1>
           </div>
-          <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
+          <p className="text-base xl:text-xl text-muted-foreground max-w-2xl mx-auto">
             Get AI credits to power your content creation. No subscriptions, pay only for what you need.
           </p>
         </div>
 
         {loading ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 xl:gap-6">
             {[1, 2, 3, 4].map((i) => (
               <Card key={i} className="relative">
                 <CardHeader>
@@ -102,12 +102,12 @@ export default function PricingPage() {
             ))}
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 xl:gap-6">
             {products.map((product, index) => (
               <Card 
                 key={product.id} 
                 className={`relative transition-all hover:shadow-xl ${
-                  index === 2 ? 'border-primary shadow-lg scale-105' : ''
+                  index === 2 ? 'border-primary shadow-lg sm:scale-105' : ''
                 }`}
               >
                 {index === 2 && (
@@ -115,26 +115,26 @@ export default function PricingPage() {
                     Best Value
                   </Badge>
                 )}
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <Zap className="h-5 w-5 text-primary" />
+                <CardHeader className="pb-4">
+                  <CardTitle className="flex items-center gap-2 text-lg xl:text-xl">
+                    <Zap className="h-4 w-4 xl:h-5 xl:w-5 text-primary" />
                     {product.name}
                   </CardTitle>
-                  <CardDescription>{product.description}</CardDescription>
+                  <CardDescription className="text-xs xl:text-sm">{product.description}</CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-4">
                   <div className="flex items-baseline gap-2">
-                    <span className="text-4xl font-bold">${product.price}</span>
-                    <span className="text-muted-foreground">USD</span>
+                    <span className="text-3xl xl:text-4xl font-bold">${product.price}</span>
+                    <span className="text-sm text-muted-foreground">USD</span>
                   </div>
-                  <div className="flex items-center gap-2 text-primary font-semibold">
+                  <div className="flex items-center gap-2 text-primary font-semibold text-sm xl:text-base">
                     <Sparkles className="h-4 w-4" />
                     <span>{product.credits} Credits</span>
                   </div>
                   <div className="space-y-2 pt-4">
                     {features.slice(0, 4).map((feature, i) => (
-                      <div key={i} className="flex items-center gap-2 text-sm">
-                        <Check className="h-4 w-4 text-primary shrink-0" />
+                      <div key={i} className="flex items-center gap-2 text-xs xl:text-sm">
+                        <Check className="h-3 w-3 xl:h-4 xl:w-4 text-primary shrink-0" />
                         <span>{feature}</span>
                       </div>
                     ))}
@@ -155,30 +155,30 @@ export default function PricingPage() {
           </div>
         )}
 
-        <div className="mt-16 max-w-3xl mx-auto">
+        <div className="mt-12 xl:mt-16 max-w-3xl mx-auto">
           <Card>
             <CardHeader>
-              <CardTitle>What are AI Credits?</CardTitle>
+              <CardTitle className="text-lg xl:text-xl">What are AI Credits?</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
-              <p className="text-muted-foreground">
+              <p className="text-sm xl:text-base text-muted-foreground">
                 AI Credits are used to power all AI features in VIRALIX. Each generation consumes credits based on complexity:
               </p>
               <ul className="space-y-2">
-                <li className="flex items-start gap-2">
-                  <Check className="h-5 w-5 text-primary shrink-0 mt-0.5" />
+                <li className="flex items-start gap-2 text-sm xl:text-base">
+                  <Check className="h-4 w-4 xl:h-5 xl:w-5 text-primary shrink-0 mt-0.5" />
                   <span><strong>AI Video:</strong> 10-50 credits per video (depending on duration)</span>
                 </li>
-                <li className="flex items-start gap-2">
-                  <Check className="h-5 w-5 text-primary shrink-0 mt-0.5" />
+                <li className="flex items-start gap-2 text-sm xl:text-base">
+                  <Check className="h-4 w-4 xl:h-5 xl:w-5 text-primary shrink-0 mt-0.5" />
                   <span><strong>AI Image:</strong> 5-10 credits per image</span>
                 </li>
-                <li className="flex items-start gap-2">
-                  <Check className="h-5 w-5 text-primary shrink-0 mt-0.5" />
+                <li className="flex items-start gap-2 text-sm xl:text-base">
+                  <Check className="h-4 w-4 xl:h-5 xl:w-5 text-primary shrink-0 mt-0.5" />
                   <span><strong>AI Chat:</strong> 1-2 credits per conversation</span>
                 </li>
               </ul>
-              <p className="text-sm text-muted-foreground pt-4">
+              <p className="text-xs xl:text-sm text-muted-foreground pt-4">
                 Credits never expire and can be used anytime. Get started with 100 free credits when you sign up!
               </p>
             </CardContent>

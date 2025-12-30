@@ -24,10 +24,33 @@ const ChatAssistantPage: React.FC = () => {
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   const promptTemplates = [
-    { label: 'Write Video Script', prompt: 'Write a viral video script about [topic] for social media' },
-    { label: 'Generate Image Prompt', prompt: 'Create a detailed image generation prompt for [description]' },
-    { label: 'Improve Prompt', prompt: 'Improve this prompt for better AI generation: [your prompt]' },
-    { label: 'Content Ideas', prompt: 'Give me 5 viral content ideas for [niche/platform]' },
+    { 
+      label: 'Write Video Script', 
+      prompt: 'Write a viral video script about [topic] for social media',
+      description: 'Write a viral video script about [topic] for social media'
+    },
+    { 
+      label: 'Generate Image Prompt', 
+      prompt: 'Create a detailed image generation prompt for [description]',
+      description: 'Create a detailed image generation prompt for [description]'
+    },
+    { 
+      label: 'Improve Prompt', 
+      prompt: 'Improve this prompt for better AI generation: [your prompt]',
+      description: 'Improve this prompt for better AI generation: [your prompt]'
+    },
+    { 
+      label: 'Content Ideas', 
+      prompt: 'Give me 5 viral content ideas for [niche/platform]',
+      description: 'Give me 5 viral content ideas for [niche/platform]'
+    },
+  ];
+
+  const tips = [
+    'Be specific in your requests',
+    'Ask for improvements on prompts',
+    'Request multiple variations',
+    'Copy responses to use in generators'
   ];
 
   useEffect(() => {
@@ -106,32 +129,32 @@ const ChatAssistantPage: React.FC = () => {
   };
 
   return (
-    <div className="container mx-auto px-4 py-8 max-w-6xl">
-      <div className="mb-8">
-        <h1 className="text-4xl font-bold mb-2 flex items-center gap-3">
-          <MessageSquare className="w-10 h-10 text-primary" />
+    <div className="container mx-auto px-4 py-6 xl:py-8 max-w-7xl">
+      <div className="mb-6">
+        <h1 className="text-3xl xl:text-4xl font-bold mb-2 flex items-center gap-3">
+          <MessageSquare className="w-8 h-8 xl:w-10 xl:h-10 text-primary" />
           AI Chat Assistant
         </h1>
-        <p className="text-muted-foreground text-lg">
+        <p className="text-muted-foreground text-base xl:text-lg">
           Get help with scripts, prompts, and viral content ideas
         </p>
       </div>
 
-      <div className="grid gap-6 xl:grid-cols-[1fr_300px]">
+      <div className="grid gap-4 xl:gap-6 xl:grid-cols-[1fr_320px]">
         {/* Chat Area */}
-        <Card className="flex flex-col h-[calc(100vh-250px)]">
-          <CardHeader className="border-b">
-            <CardTitle>Chat</CardTitle>
+        <Card className="flex flex-col h-[calc(100vh-220px)] xl:h-[calc(100vh-200px)]">
+          <CardHeader className="border-b pb-4">
+            <CardTitle className="text-lg xl:text-xl">Chat</CardTitle>
             <CardDescription>Ask anything about content creation</CardDescription>
           </CardHeader>
           <CardContent className="flex-1 flex flex-col p-0">
             {/* Messages */}
             <ScrollArea className="flex-1 p-4" ref={scrollRef}>
               {messages.length === 0 && (
-                <div className="h-full flex items-center justify-center text-center text-muted-foreground">
+                <div className="h-full flex items-center justify-center text-center text-muted-foreground px-4">
                   <div>
-                    <Sparkles className="w-16 h-16 mx-auto mb-4 opacity-50" />
-                    <p className="text-lg font-medium mb-2">Start a Conversation</p>
+                    <Sparkles className="w-12 h-12 xl:w-16 xl:h-16 mx-auto mb-4 opacity-50" />
+                    <p className="text-base xl:text-lg font-medium mb-2">Start a Conversation</p>
                     <p className="text-sm">Ask me to help you create viral content, write scripts, or improve prompts</p>
                   </div>
                 </div>
@@ -143,7 +166,7 @@ const ChatAssistantPage: React.FC = () => {
                     className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}
                   >
                     <div
-                      className={`max-w-[80%] rounded-lg p-4 ${
+                      className={`max-w-[85%] xl:max-w-[80%] rounded-lg p-3 xl:p-4 ${
                         message.role === 'user'
                           ? 'bg-primary text-primary-foreground'
                           : 'bg-muted'
@@ -154,7 +177,7 @@ const ChatAssistantPage: React.FC = () => {
                           <Streamdown>{message.content}</Streamdown>
                         </div>
                       ) : (
-                        <p className="whitespace-pre-wrap">{message.content}</p>
+                        <p className="whitespace-pre-wrap text-sm xl:text-base">{message.content}</p>
                       )}
                       <div className="flex items-center justify-between mt-2 pt-2 border-t border-border/50">
                         <span className="text-xs opacity-70">
@@ -189,7 +212,7 @@ const ChatAssistantPage: React.FC = () => {
             </ScrollArea>
 
             {/* Input Area */}
-            <div className="border-t p-4">
+            <div className="border-t p-3 xl:p-4">
               <div className="flex gap-2">
                 <Textarea
                   ref={textareaRef}
@@ -197,7 +220,7 @@ const ChatAssistantPage: React.FC = () => {
                   onChange={(e) => setInput(e.target.value)}
                   onKeyDown={handleKeyDown}
                   placeholder="Type your message... (Shift+Enter for new line)"
-                  className="resize-none"
+                  className="resize-none text-sm xl:text-base"
                   rows={3}
                 />
                 <Button
@@ -206,7 +229,7 @@ const ChatAssistantPage: React.FC = () => {
                   size="icon"
                   className="shrink-0 h-auto gradient-primary text-white"
                 >
-                  <Send className="w-5 h-5" />
+                  <Send className="w-4 h-4 xl:w-5 xl:h-5" />
                 </Button>
               </div>
             </div>
@@ -216,38 +239,34 @@ const ChatAssistantPage: React.FC = () => {
         {/* Sidebar with Templates */}
         <div className="space-y-4">
           <Card>
-            <CardHeader>
-              <CardTitle className="text-lg">Quick Templates</CardTitle>
+            <CardHeader className="pb-3">
+              <CardTitle className="text-base xl:text-lg">Quick Templates</CardTitle>
               <CardDescription className="text-xs">Click to use a template</CardDescription>
             </CardHeader>
             <CardContent className="space-y-2">
               {promptTemplates.map((template, index) => (
-                <Button
+                <button
                   key={index}
-                  variant="outline"
-                  className="w-full justify-start text-left h-auto py-3"
                   onClick={() => handleTemplateClick(template.prompt)}
+                  className="w-full text-left p-3 rounded-lg border border-border hover:bg-accent hover:border-primary/50 transition-all"
                 >
-                  <div>
-                    <p className="font-medium text-sm">{template.label}</p>
-                    <p className="text-xs text-muted-foreground mt-1 line-clamp-2">
-                      {template.prompt}
-                    </p>
-                  </div>
-                </Button>
+                  <p className="font-medium text-sm mb-1">{template.label}</p>
+                  <p className="text-xs text-muted-foreground line-clamp-2">
+                    {template.description}
+                  </p>
+                </button>
               ))}
             </CardContent>
           </Card>
 
           <Card>
-            <CardHeader>
-              <CardTitle className="text-lg">Tips</CardTitle>
+            <CardHeader className="pb-3">
+              <CardTitle className="text-base xl:text-lg">Tips</CardTitle>
             </CardHeader>
-            <CardContent className="space-y-2 text-sm text-muted-foreground">
-              <p>• Be specific in your requests</p>
-              <p>• Ask for improvements on prompts</p>
-              <p>• Request multiple variations</p>
-              <p>• Copy responses to use in generators</p>
+            <CardContent className="space-y-2">
+              {tips.map((tip, index) => (
+                <p key={index} className="text-sm text-muted-foreground">• {tip}</p>
+              ))}
             </CardContent>
           </Card>
         </div>

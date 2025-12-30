@@ -69,21 +69,21 @@ export default function OrderHistoryPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-background to-primary/5">
-      <div className="container mx-auto px-4 py-12">
-        <div className="mb-8">
+      <div className="container mx-auto px-4 py-6 xl:py-12">
+        <div className="mb-6 xl:mb-8">
           <Button
             variant="ghost"
             onClick={() => navigate('/')}
-            className="mb-4"
+            className="mb-4 text-sm xl:text-base"
           >
             <ArrowLeft className="h-4 w-4 mr-2" />
             Back to Home
           </Button>
           <div className="flex items-center gap-3">
-            <ShoppingBag className="h-8 w-8 text-primary" />
+            <ShoppingBag className="h-6 w-6 xl:h-8 xl:w-8 text-primary" />
             <div>
-              <h1 className="text-3xl font-bold">Order History</h1>
-              <p className="text-muted-foreground">View and manage your purchases</p>
+              <h1 className="text-2xl xl:text-3xl font-bold">Order History</h1>
+              <p className="text-sm xl:text-base text-muted-foreground">View and manage your purchases</p>
             </div>
           </div>
         </div>
@@ -104,10 +104,10 @@ export default function OrderHistoryPage() {
           </div>
         ) : orders.length === 0 ? (
           <Card>
-            <CardContent className="flex flex-col items-center justify-center py-12">
-              <ShoppingBag className="h-16 w-16 text-muted-foreground mb-4" />
-              <h3 className="text-xl font-semibold mb-2">No orders yet</h3>
-              <p className="text-muted-foreground mb-6">Start creating amazing content with AI credits</p>
+            <CardContent className="flex flex-col items-center justify-center py-12 xl:py-16">
+              <ShoppingBag className="h-12 w-12 xl:h-16 xl:w-16 text-muted-foreground mb-4" />
+              <h3 className="text-lg xl:text-xl font-semibold mb-2">No orders yet</h3>
+              <p className="text-sm xl:text-base text-muted-foreground mb-6 text-center">Start creating amazing content with AI credits</p>
               <Button onClick={() => navigate('/pricing')}>
                 Browse Plans
               </Button>
@@ -117,13 +117,13 @@ export default function OrderHistoryPage() {
           <div className="space-y-4">
             {orders.map((order) => (
               <Card key={order.id}>
-                <CardHeader>
-                  <div className="flex items-start justify-between">
+                <CardHeader className="pb-4">
+                  <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-2">
                     <div>
-                      <CardTitle className="text-lg">
+                      <CardTitle className="text-base xl:text-lg">
                         Order #{order.id.slice(0, 8)}
                       </CardTitle>
-                      <CardDescription>
+                      <CardDescription className="text-xs xl:text-sm">
                         {format(new Date(order.created_at), 'PPP p')}
                       </CardDescription>
                     </div>
@@ -133,10 +133,10 @@ export default function OrderHistoryPage() {
                 <CardContent className="space-y-4">
                   <div className="space-y-2">
                     {order.items.map((item, index) => (
-                      <div key={index} className="flex justify-between items-center">
+                      <div key={index} className="flex justify-between items-center text-sm xl:text-base">
                         <div>
                           <p className="font-medium">{item.name}</p>
-                          <p className="text-sm text-muted-foreground">
+                          <p className="text-xs xl:text-sm text-muted-foreground">
                             Quantity: {item.quantity}
                           </p>
                         </div>
@@ -148,8 +148,8 @@ export default function OrderHistoryPage() {
                   </div>
                   
                   <div className="border-t pt-4 flex justify-between items-center">
-                    <span className="font-semibold">Total:</span>
-                    <span className="text-xl font-bold">
+                    <span className="font-semibold text-sm xl:text-base">Total:</span>
+                    <span className="text-lg xl:text-xl font-bold">
                       ${order.total_amount.toFixed(2)} {order.currency.toUpperCase()}
                     </span>
                   </div>
@@ -175,7 +175,7 @@ export default function OrderHistoryPage() {
                   )}
 
                   {order.status === 'completed' && order.completed_at && (
-                    <div className="text-sm text-muted-foreground">
+                    <div className="text-xs xl:text-sm text-muted-foreground">
                       Completed on {format(new Date(order.completed_at), 'PPP p')}
                     </div>
                   )}
