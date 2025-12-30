@@ -155,11 +155,14 @@ export const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
         <div className="flex flex-col h-full">
           {/* Logo */}
           <div className="p-6 border-b border-border">
-            <Link to="/" className="flex items-center gap-2">
-              <div className="w-10 h-10 rounded-lg gradient-primary flex items-center justify-center">
-                <Sparkles className="w-6 h-6 text-white" />
+            <Link to="/" className="flex items-center gap-3 group">
+              <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-primary via-primary to-secondary flex items-center justify-center shadow-lg group-hover:shadow-xl transition-all">
+                <Sparkles className="w-7 h-7 text-white" />
               </div>
-              <span className="text-2xl font-bold gradient-text">TrendStudio</span>
+              <div className="flex flex-col">
+                <span className="text-2xl font-bold gradient-text">TrendStudio</span>
+                <span className="text-xs text-muted-foreground">Studio de création IA</span>
+              </div>
             </Link>
           </div>
 
@@ -198,11 +201,14 @@ export const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
         {/* Mobile Header */}
         <header className="lg:hidden sticky top-0 z-40 border-b border-border bg-card/95 backdrop-blur supports-[backdrop-filter]:bg-card/60">
           <div className="flex items-center justify-between p-4">
-            <Link to="/" className="flex items-center gap-2">
-              <div className="w-8 h-8 rounded-lg gradient-primary flex items-center justify-center">
-                <Sparkles className="w-5 h-5 text-white" />
+            <Link to="/" className="flex items-center gap-2 group">
+              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary via-primary to-secondary flex items-center justify-center shadow-md group-hover:shadow-lg transition-all">
+                <Sparkles className="w-6 h-6 text-white" />
               </div>
-              <span className="text-xl font-bold gradient-text">TrendStudio</span>
+              <div className="flex flex-col">
+                <span className="text-xl font-bold gradient-text">TrendStudio</span>
+                <span className="text-[10px] text-muted-foreground leading-none">Studio IA</span>
+              </div>
             </Link>
 
             <div className="flex items-center gap-2">
@@ -229,11 +235,14 @@ export const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
                 <SheetContent side="left" className="w-64 p-0">
                   <div className="flex flex-col h-full">
                     <div className="p-6 border-b border-border">
-                      <Link to="/" className="flex items-center gap-2">
-                        <div className="w-10 h-10 rounded-lg gradient-primary flex items-center justify-center">
-                          <Sparkles className="w-6 h-6 text-white" />
+                      <Link to="/" className="flex items-center gap-3 group">
+                        <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-primary via-primary to-secondary flex items-center justify-center shadow-lg group-hover:shadow-xl transition-all">
+                          <Sparkles className="w-7 h-7 text-white" />
                         </div>
-                        <span className="text-2xl font-bold gradient-text">TrendStudio</span>
+                        <div className="flex flex-col">
+                          <span className="text-2xl font-bold gradient-text">TrendStudio</span>
+                          <span className="text-xs text-muted-foreground">Studio de création IA</span>
+                        </div>
                       </Link>
                     </div>
                     <div className="flex-1 p-4 overflow-y-auto">
