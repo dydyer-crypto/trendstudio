@@ -3,34 +3,37 @@ import { Link } from 'react-router-dom';
 import { Video, Image as ImageIcon, MessageSquare, FileText, Sparkles, Zap, Wand2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { useAuth } from '@/contexts/AuthContext';
 
 const HomePage: React.FC = () => {
+  const { user } = useAuth();
+
   const features = [
     {
       icon: <Video className="w-8 h-8" />,
-      title: 'AI Video Generator',
-      description: 'Generate stunning AI videos up to 4 minutes long with flexible aspect ratios for any platform.',
+      title: 'Générateur de Vidéo IA',
+      description: 'Générez des vidéos IA époustouflantes jusqu\'à 4 minutes avec des ratios flexibles pour toute plateforme.',
       link: '/video-generator',
       gradient: 'from-primary to-secondary',
     },
     {
       icon: <ImageIcon className="w-8 h-8" />,
-      title: 'AI Image Generator',
-      description: 'Create high-resolution, cinematic images from text or transform existing images with AI.',
+      title: 'Générateur d\'Image IA',
+      description: 'Créez des images haute résolution et cinématographiques à partir de texte ou transformez des images existantes avec l\'IA.',
       link: '/image-generator',
       gradient: 'from-secondary to-primary',
     },
     {
       icon: <MessageSquare className="w-8 h-8" />,
-      title: 'AI Chat Assistant',
-      description: 'Get help writing scripts, creating viral content ideas, and optimizing your prompts.',
+      title: 'Assistant Chat IA',
+      description: 'Obtenez de l\'aide pour écrire des scripts, créer des idées de contenu viral et optimiser vos prompts.',
       link: '/chat-assistant',
       gradient: 'from-primary via-secondary to-primary',
     },
     {
       icon: <FileText className="w-8 h-8" />,
-      title: 'Script to Video',
-      description: 'Transform your scripts into complete videos with automatic scene breakdown and generation.',
+      title: 'Script vers Vidéo',
+      description: 'Transformez vos scripts en vidéos complètes avec découpage automatique des scènes et génération.',
       link: '/script-to-video',
       gradient: 'from-secondary to-primary',
     },
@@ -38,6 +41,52 @@ const HomePage: React.FC = () => {
 
   return (
     <div className="min-h-screen">
+      {/* Header/Navbar */}
+      <header className="sticky top-0 z-50 border-b border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+        <div className="container mx-auto px-4 py-4">
+          <div className="flex items-center justify-between">
+            {/* Logo */}
+            <Link to="/" className="flex items-center gap-3 group">
+              <div className="w-10 h-10 xl:w-12 xl:h-12 rounded-xl bg-gradient-to-br from-primary via-primary to-secondary flex items-center justify-center shadow-lg group-hover:shadow-xl transition-all">
+                <Sparkles className="w-6 h-6 xl:w-7 xl:h-7 text-white" />
+              </div>
+              <div className="flex flex-col">
+                <span className="text-xl xl:text-2xl font-bold gradient-text">TrendStudio</span>
+                <span className="text-[10px] xl:text-xs text-muted-foreground leading-none">Studio de création IA</span>
+              </div>
+            </Link>
+
+            {/* Navigation */}
+            <div className="flex items-center gap-4">
+              {user ? (
+                <Link to="/video-generator">
+                  <Button className="gap-2">
+                    <Sparkles className="w-4 h-4" />
+                    <span className="hidden sm:inline">Tableau de bord</span>
+                    <span className="sm:hidden">App</span>
+                  </Button>
+                </Link>
+              ) : (
+                <>
+                  <Link to="/login">
+                    <Button variant="ghost" className="hidden sm:inline-flex">
+                      Connexion
+                    </Button>
+                  </Link>
+                  <Link to="/login">
+                    <Button className="gap-2">
+                      <Sparkles className="w-4 h-4" />
+                      <span className="hidden sm:inline">Commencer gratuitement</span>
+                      <span className="sm:hidden">Commencer</span>
+                    </Button>
+                  </Link>
+                </>
+              )}
+            </div>
+          </div>
+        </div>
+      </header>
+
       {/* Hero Section */}
       <section className="relative overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-br from-primary/10 via-secondary/10 to-background" />
@@ -45,30 +94,30 @@ const HomePage: React.FC = () => {
           <div className="max-w-4xl mx-auto text-center space-y-8">
             <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-accent text-accent-foreground text-sm font-medium">
               <Sparkles className="w-4 h-4" />
-              <span>All-in-One AI Content Creation Studio</span>
+              <span>Studio de création de contenu IA tout-en-un</span>
             </div>
             
             <h1 className="text-4xl xl:text-6xl font-bold leading-tight">
-              Create Viral Content with{' '}
-              <span className="gradient-text">AI-Powered Tools</span>
+              Créez du contenu viral avec des{' '}
+              <span className="gradient-text">outils IA puissants</span>
             </h1>
             
             <p className="text-lg xl:text-xl text-muted-foreground max-w-2xl mx-auto">
-              Generate, write, animate, and edit AI images and videos in one place. 
-              Replace multiple AI tools with one powerful platform designed for content creators.
+              Générez, écrivez, animez et éditez des images et vidéos IA en un seul endroit. 
+              Remplacez plusieurs outils IA par une plateforme puissante conçue pour les créateurs de contenu.
             </p>
             
             <div className="flex flex-col xl:flex-row items-center justify-center gap-4">
               <Link to="/video-generator">
                 <Button size="lg" className="gradient-primary text-white gap-2 shadow-lg hover:shadow-xl transition-all">
                   <Zap className="w-5 h-5" />
-                  Start Creating Videos
+                  Commencer à créer des vidéos
                 </Button>
               </Link>
               <Link to="/image-generator">
                 <Button size="lg" variant="outline" className="gap-2">
                   <Wand2 className="w-5 h-5" />
-                  Generate Images
+                  Générer des images
                 </Button>
               </Link>
             </div>
@@ -80,10 +129,10 @@ const HomePage: React.FC = () => {
       <section className="container mx-auto px-4 py-16 xl:py-24">
         <div className="text-center mb-12">
           <h2 className="text-3xl xl:text-4xl font-bold mb-4">
-            Everything You Need to Go Viral
+            Tout ce dont vous avez besoin pour devenir viral
           </h2>
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-            Professional AI tools for creating engaging content across all social media platforms
+            Outils IA professionnels pour créer du contenu engageant sur toutes les plateformes de médias sociaux
           </p>
         </div>
 

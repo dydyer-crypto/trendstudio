@@ -89,6 +89,8 @@
   - [x] Add gradient background and shadow effects
   - [x] Add hover animations for better interactivity
   - [x] Include French tagline "Studio de création IA"
+  - [x] Add header with logo to HomePage
+  - [x] Translate HomePage content to French
 
 ## Notes
 - First registered user becomes admin automatically
@@ -103,4 +105,5 @@
 - Brand name changed from VIRALIX to TrendStudio across all files
 - Application UI fully localized in French for French-speaking users
 - AI generation features (video, image, chat) are properly configured and ready to use
-- Enhanced logo with gradient background, shadow effects, and French tagline visible in top left
+- Enhanced logo with gradient background, shadow effects, and French tagline visible in top left on all pages including HomePage
+- HomePage now has a sticky header with TrendStudio logo and navigation buttons
