@@ -169,6 +169,9 @@
   - [x] Set French as default language with English fallback
   - [x] Add flag emojis for visual language identification
   - [x] Fix authentication: disable email verification for instant signup/login
+  - [x] Fix signup error: update handle_new_user function to include username field
+  - [x] Extract username from email format (username@miaoda.com)
+  - [x] Award bonus credits for referral signups (100 credits vs 50 default)
 
 ## Notes
 - First registered user becomes admin automatically
