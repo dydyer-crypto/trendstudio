@@ -67,14 +67,22 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const signInWithUsername = async (username: string, password: string) => {
     try {
       const email = `${username}@miaoda.com`;
-      const { error } = await supabase.auth.signInWithPassword({
+      console.log('Tentative de connexion avec:', email);
+      
+      const { data, error } = await supabase.auth.signInWithPassword({
         email,
         password,
       });
 
-      if (error) throw error;
+      if (error) {
+        console.error('Erreur de connexion:', error);
+        throw error;
+      }
+      
+      console.log('Connexion réussie:', data);
       return { error: null };
     } catch (error) {
+      console.error('Exception lors de la connexion:', error);
       return { error: error as Error };
     }
   };
@@ -82,6 +90,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const signUpWithUsername = async (username: string, password: string, referralCode?: string) => {
     try {
       const email = `${username}@miaoda.com`;
+      console.log('Tentative d\'inscription avec:', email, 'Code parrainage:', referralCode);
+      
       const options: any = {
         email,
         password,
@@ -96,11 +106,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         };
       }
       
-      const { error } = await supabase.auth.signUp(options);
+      const { data, error } = await supabase.auth.signUp(options);
 
-      if (error) throw error;
+      if (error) {
+        console.error('Erreur d\'inscription:', error);
+        throw error;
+      }
+      
+      console.log('Inscription réussie:', data);
       return { error: null };
     } catch (error) {
+      console.error('Exception lors de l\'inscription:', error);
       return { error: error as Error };
     }
   };

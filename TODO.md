@@ -172,6 +172,8 @@
   - [x] Fix signup error: update handle_new_user function to include username field
   - [x] Extract username from email format (username@miaoda.com)
   - [x] Award bonus credits for referral signups (100 credits vs 50 default)
+  - [x] Add debug logging to AuthContext for troubleshooting login issues
+  - [x] Create TROUBLESHOOTING.md guide for login debugging
 
 ## Notes
 - First registered user becomes admin automatically
