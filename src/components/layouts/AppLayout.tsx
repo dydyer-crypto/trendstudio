@@ -14,7 +14,12 @@ import {
   ShoppingBag,
   LogOut,
   User,
-  LogIn
+  LogIn,
+  Calendar,
+  TrendingUp,
+  BarChart3,
+  GraduationCap,
+  Users
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
@@ -42,12 +47,17 @@ interface NavItem {
 }
 
 const navItems: NavItem[] = [
-  { name: 'AI Video Generator', path: '/video-generator', icon: <Video className="w-5 h-5" /> },
-  { name: 'AI Image Generator', path: '/image-generator', icon: <ImageIcon className="w-5 h-5" /> },
-  { name: 'AI Chat Assistant', path: '/chat-assistant', icon: <MessageSquare className="w-5 h-5" /> },
-  { name: 'Script to Video', path: '/script-to-video', icon: <FileText className="w-5 h-5" /> },
-  { name: 'Video Editor', path: '/video-editor', icon: <Scissors className="w-5 h-5" /> },
-  { name: 'Pricing', path: '/pricing', icon: <CreditCard className="w-5 h-5" /> },
+  { name: 'Générateur Vidéo IA', path: '/video-generator', icon: <Video className="w-5 h-5" /> },
+  { name: 'Générateur Image IA', path: '/image-generator', icon: <ImageIcon className="w-5 h-5" /> },
+  { name: 'Assistant Chat IA', path: '/chat-assistant', icon: <MessageSquare className="w-5 h-5" /> },
+  { name: 'Script vers Vidéo', path: '/script-to-video', icon: <FileText className="w-5 h-5" /> },
+  { name: 'Éditeur Vidéo', path: '/video-editor', icon: <Scissors className="w-5 h-5" /> },
+  { name: 'Calendrier', path: '/calendar', icon: <Calendar className="w-5 h-5" /> },
+  { name: 'Tendances', path: '/trends', icon: <TrendingUp className="w-5 h-5" /> },
+  { name: 'Analytics', path: '/analytics', icon: <BarChart3 className="w-5 h-5" /> },
+  { name: 'Tutoriels', path: '/tutorials', icon: <GraduationCap className="w-5 h-5" /> },
+  { name: 'Affiliation', path: '/affiliate', icon: <Users className="w-5 h-5" /> },
+  { name: 'Tarifs', path: '/pricing', icon: <CreditCard className="w-5 h-5" /> },
 ];
 
 export const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {

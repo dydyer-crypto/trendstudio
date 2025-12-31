@@ -174,6 +174,9 @@
   - [x] Award bonus credits for referral signups (100 credits vs 50 default)
   - [x] Add debug logging to AuthContext for troubleshooting login issues
   - [x] Create TROUBLESHOOTING.md guide for login debugging
+  - [x] Fix navigation: add all new features to AppLayout navItems
+  - [x] Update navigation labels to French
+  - [x] Add icons for new features (Calendar, TrendingUp, BarChart3, GraduationCap, Users)
 
 ## Notes
 - First registered user becomes admin automatically
