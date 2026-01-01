@@ -38,22 +38,23 @@ export function AuditReport({ results }: AuditReportProps) {
             </div>
 
             <Tabs defaultValue="strategy" className="w-full">
-                <TabsList className="grid w-full grid-cols-3 lg:w-[600px] mx-auto mb-8">
+                <TabsList className="grid w-full grid-cols-2 lg:grid-cols-4 lg:w-[800px] mx-auto mb-8">
                     <TabsTrigger value="strategy">Stratégie IA</TabsTrigger>
+                    <TabsTrigger value="variants">Variantes Refonte</TabsTrigger>
                     <TabsTrigger value="action">Plan d'Action</TabsTrigger>
                     <TabsTrigger value="budget">Estimation</TabsTrigger>
                 </TabsList>
 
                 {/* Strategy Tab */}
                 <TabsContent value="strategy" className="space-y-6">
-                    <Card className="border-2 border-primary/10">
+                    <Card className="border-2 border-primary/10 bg-primary/5">
                         <CardHeader>
                             <CardTitle className="text-2xl flex items-center gap-2">
-                                <Trophy className="text-yellow-500" /> Résumé Stratégique
+                                <Trophy className="text-yellow-500" /> Résumé Audit Stratégique
                             </CardTitle>
                         </CardHeader>
                         <CardContent>
-                            <p className="text-lg leading-relaxed text-muted-foreground italic">
+                            <p className="text-lg leading-relaxed text-muted-foreground italic font-medium">
                                 "{results.summary}"
                             </p>
                         </CardContent>
@@ -68,8 +69,10 @@ export function AuditReport({ results }: AuditReportProps) {
                             </CardHeader>
                             <CardContent className="space-y-3">
                                 {results.strengths.map((str, idx) => (
-                                    <div key={idx} className="flex gap-2 items-center text-sm">
-                                        <div className="h-1.5 w-1.5 rounded-full bg-green-500" />
+                                    <div key={idx} className="flex gap-2 items-start text-sm">
+                                        <div className="h-5 w-5 shrink-0 flex items-center justify-center">
+                                            <CheckCircle className="h-3 w-3 text-green-500" />
+                                        </div>
                                         {str}
                                     </div>
                                 ))}
@@ -84,13 +87,52 @@ export function AuditReport({ results }: AuditReportProps) {
                             </CardHeader>
                             <CardContent className="space-y-3">
                                 {results.weaknesses.map((weak, idx) => (
-                                    <div key={idx} className="flex gap-2 items-center text-sm">
-                                        <div className="h-1.5 w-1.5 rounded-full bg-destructive" />
+                                    <div key={idx} className="flex gap-2 items-start text-sm">
+                                        <div className="h-5 w-5 shrink-0 flex items-center justify-center">
+                                            <AlertCircle className="h-3 w-3 text-destructive" />
+                                        </div>
                                         {weak}
                                     </div>
                                 ))}
                             </CardContent>
                         </Card>
+                    </div>
+                </TabsContent>
+
+                {/* Redesign Variants Tab */}
+                <TabsContent value="variants" className="space-y-6">
+                    <div className="grid gap-6 md:grid-cols-2">
+                        {results.redesign_variants?.map((variant, idx) => (
+                            <Card key={idx} className="overflow-hidden border-2 hover:border-primary/50 transition-all group">
+                                <div className="h-2 w-full bg-gradient-to-r from-primary to-purple-600" />
+                                <CardHeader>
+                                    <div className="flex justify-between items-start mb-2">
+                                        <Badge variant="outline" className="bg-primary/5 text-primary">
+                                            {variant.type}
+                                        </Badge>
+                                        <span className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">Focus: {variant.focus}</span>
+                                    </div>
+                                    <CardTitle className="text-xl group-hover:text-primary transition-colors">
+                                        {variant.title}
+                                    </CardTitle>
+                                </CardHeader>
+                                <CardContent className="space-y-4">
+                                    <p className="text-sm text-muted-foreground leading-relaxed">
+                                        {variant.description}
+                                    </p>
+                                    <div className="space-y-2">
+                                        <p className="text-xs font-bold uppercase text-primary">Points Clés :</p>
+                                        <div className="flex flex-wrap gap-2">
+                                            {variant.pros.map((pro, pidx) => (
+                                                <Badge key={pidx} variant="secondary" className="bg-primary/5 text-primary text-[10px]">
+                                                    {pro}
+                                                </Badge>
+                                            ))}
+                                        </div>
+                                    </div>
+                                </CardContent>
+                            </Card>
+                        ))}
                     </div>
                 </TabsContent>
 

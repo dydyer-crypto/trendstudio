@@ -81,11 +81,40 @@ export class PDFService {
 
         yPos += (summaryLines.length * 5) + 15;
 
+        // Redesign Variants
+        doc.setFontSize(12);
+        doc.setFont('helvetica', 'bold');
+        doc.setTextColor(primaryColor[0], primaryColor[1], primaryColor[2]);
+        doc.text('2. VARIANTES STRATÉGIQUES PROPOSÉES', 20, yPos);
+        yPos += 8;
+
+        report.redesign_variants.forEach((v, idx) => {
+            doc.setFontSize(10);
+            doc.setFont('helvetica', 'bold');
+            doc.setTextColor(secondaryColor[0], secondaryColor[1], secondaryColor[2]);
+            doc.text(`${v.title} (${v.type})`, 25, yPos);
+            yPos += 5;
+
+            doc.setFontSize(9);
+            doc.setFont('helvetica', 'normal');
+            doc.setTextColor(100, 100, 100);
+            const variantLines = doc.splitTextToSize(`Focus: ${v.focus} - ${v.description}`, 160);
+            doc.text(variantLines, 25, yPos);
+            yPos += (variantLines.length * 4) + 5;
+
+            if (yPos > 260) {
+                doc.addPage();
+                yPos = 30;
+            }
+        });
+
+        yPos += 5;
+
         // Action Plan
         doc.setFontSize(12);
         doc.setFont('helvetica', 'bold');
         doc.setTextColor(primaryColor[0], primaryColor[1], primaryColor[2]);
-        doc.text('2. PLAN D\'ACTION PRÉCONISÉ', 20, yPos);
+        doc.text('3. PLAN D\'ACTION PRÉCONISÉ', 20, yPos);
         yPos += 5;
 
         (doc as any).autoTable({

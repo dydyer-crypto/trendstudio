@@ -18,6 +18,13 @@ export interface ConsultantReport {
             price: number;
         }>;
     };
+    redesign_variants: Array<{
+        type: string;
+        title: string;
+        description: string;
+        pros: string[];
+        focus: string;
+    }>;
 }
 
 export interface SEOReport {
@@ -92,8 +99,19 @@ export class AIConsultantService {
                         { "description": "Refonte UI/UX", "price": 800 },
                         { "description": "Optimisation SEO", "price": 700 }
                     ]
-                }
+                },
+                "redesign_variants": [
+                    {
+                        "type": "Performance/UX/SEO/Branding",
+                        "title": "Nom de la variante",
+                        "description": "Explication de l'approche",
+                        "pros": ["avantage 1", "avantage 2"],
+                        "focus": "L'accent principal (ex: Vitesse, Conversion, Design)"
+                    }
+                ]
             }
+            
+            IMPORTANT: Propose AU MOINS 4 variantes distinctes (ex: 1. Full Brand Refresh, 2. Conversion Machine, 3. SEO Authority, 4. Tech Performance).
             
             Réponds UNIQUEMENT avec le JSON. Sois professionnel et réaliste dans tes estimations.
         `;
