@@ -1,8 +1,8 @@
-
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import {
     AlertCircle,
     CheckCircle,
@@ -14,9 +14,11 @@ import {
     Trophy,
     TrendingDown,
     Wrench,
-    Coins
+    Coins,
+    Download
 } from "lucide-react";
 import type { ConsultantReport } from "@/services/aiConsultant";
+import { pdfService } from "@/services/pdfService";
 
 interface AuditReportProps {
     results: ConsultantReport & { url: string; performance: number; seo: number; mobile: number; security: number };
@@ -125,10 +127,18 @@ export function AuditReport({ results }: AuditReportProps) {
                     <div className="grid gap-8 lg:grid-cols-12 items-start">
                         <div className="lg:col-span-8 space-y-4">
                             <Card>
-                                <CardHeader>
+                                <CardHeader className="flex flex-row items-center justify-between space-y-0">
                                     <CardTitle className="flex items-center gap-2">
                                         <Coins className="text-yellow-600" /> Détail de l'investissement
                                     </CardTitle>
+                                    <Button
+                                        variant="outline"
+                                        size="sm"
+                                        className="gap-2"
+                                        onClick={() => pdfService.generateQuotePDF(results)}
+                                    >
+                                        <Download size={14} /> PDF
+                                    </Button>
                                 </CardHeader>
                                 <CardContent className="space-y-4">
                                     {results.budget_estimate.items.map((item, idx) => (
@@ -168,7 +178,7 @@ function ScoreCard({ title, score, icon: Icon, color }: any) {
             <CardContent className="pt-6">
                 <div className="flex justify-between items-center mb-4">
                     <span className="font-semibold text-muted-foreground">{title}</span>
-                    <Icon className={`h-5 w-5 ${color}`} />
+                    <Icon className={`h - 5 w - 5 ${color} `} />
                 </div>
                 <div className="flex items-end gap-2 mb-2">
                     <span className="text-3xl font-bold">{score}</span>
