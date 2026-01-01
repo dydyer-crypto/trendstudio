@@ -85,6 +85,10 @@ const HookLaboratoryPage: React.FC = () => {
     const [libraryStats, setLibraryStats] = useState<HookLibraryStats | null>(null);
     const [showLibraryStats, setShowLibraryStats] = useState(false);
 
+    // Bulk operations state
+    const [selectedHooks, setSelectedHooks] = useState<Set<string>>(new Set());
+    const [showBulkActions, setShowBulkActions] = useState(false);
+
     useEffect(() => {
         loadCategories();
     }, []);
@@ -399,6 +403,112 @@ const HookLaboratoryPage: React.FC = () => {
         } catch (error) {
             console.error('Failed to record usage:', error);
         }
+    };
+
+    // Bulk operations functions
+    const toggleHookSelection = (hookId: string) => {
+        setSelectedHooks(prev => {
+            const newSet = new Set(prev);
+            if (newSet.has(hookId)) {
+                newSet.delete(hookId);
+            } else {
+                newSet.add(hookId);
+            }
+            setShowBulkActions(newSet.size > 0);
+            return newSet;
+        });
+    };
+
+    const selectAllHooks = () => {
+        if (selectedHooks.size === libraryHooks.length) {
+            setSelectedHooks(new Set());
+            setShowBulkActions(false);
+        } else {
+            setSelectedHooks(new Set(libraryHooks.map(h => h.id)));
+            setShowBulkActions(true);
+        }
+    };
+
+    const bulkDeleteHooks = async () => {
+        try {
+            for (const hookId of selectedHooks) {
+                await hookLibraryService.deleteHook(hookId);
+            }
+            setLibraryHooks(prev => prev.filter(hook => !selectedHooks.has(hook.id)));
+            setSelectedHooks(new Set());
+            setShowBulkActions(false);
+            loadLibraryStats();
+            toast({
+                title: `${selectedHooks.size} hooks supprimés`,
+                description: 'Les hooks ont été retirés de votre bibliothèque',
+            });
+        } catch (error) {
+            console.error('Failed to bulk delete hooks:', error);
+            toast({
+                title: 'Erreur',
+                description: 'Impossible de supprimer certains hooks',
+                variant: 'destructive'
+            });
+        }
+    };
+
+    const bulkToggleFavorites = async () => {
+        try {
+            for (const hookId of selectedHooks) {
+                await hookLibraryService.toggleFavorite(hookId);
+            }
+            setLibraryHooks(prev => prev.map(hook =>
+                selectedHooks.has(hook.id)
+                    ? { ...hook, isFavorite: !hook.isFavorite }
+                    : hook
+            ));
+            setSelectedHooks(new Set());
+            setShowBulkActions(false);
+            loadLibraryStats();
+            toast({
+                title: 'Favoris mis à jour',
+                description: `${selectedHooks.size} hooks ont été modifiés`,
+            });
+        } catch (error) {
+            console.error('Failed to bulk toggle favorites:', error);
+            toast({
+                title: 'Erreur',
+                description: 'Impossible de modifier certains favoris',
+                variant: 'destructive'
+            });
+        }
+    };
+
+    const exportSelectedHooks = () => {
+        const selectedData = libraryHooks.filter(hook => selectedHooks.has(hook.id));
+        const exportData = {
+            exportedAt: new Date().toISOString(),
+            hooks: selectedData.map(hook => ({
+                text: hook.hookText,
+                category: hook.category?.displayName,
+                platform: hook.platform,
+                isFavorite: hook.isFavorite,
+                usageCount: hook.usageCount,
+                performanceScore: hook.performanceScore,
+                tags: hook.tags,
+                createdAt: hook.createdAt
+            }))
+        };
+
+        const blob = new Blob([JSON.stringify(exportData, null, 2)], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `hooks-export-${new Date().toISOString().split('T')[0]}.json`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+
+        toast({
+            title: 'Export réussi',
+            description: `${selectedHooks.size} hooks exportés`,
+        });
     };
 
     return (
@@ -822,6 +932,22 @@ const HookLaboratoryPage: React.FC = () => {
                                         <BarChart3 size={14} />
                                         {showLibraryStats ? 'Masquer Stats' : 'Voir Stats'}
                                     </Button>
+                                    {libraryHooks.length > 0 && (
+                                        <Button
+                                            variant="outline"
+                                            size="sm"
+                                            onClick={selectAllHooks}
+                                            className="flex items-center gap-2"
+                                        >
+                                            <input
+                                                type="checkbox"
+                                                checked={selectedHooks.size === libraryHooks.length && libraryHooks.length > 0}
+                                                onChange={selectAllHooks}
+                                                className="rounded"
+                                            />
+                                            {selectedHooks.size === libraryHooks.length ? 'Tout désélectionner' : 'Tout sélectionner'}
+                                        </Button>
+                                    )}
                                 </div>
                             </div>
                         </CardHeader>
@@ -1033,6 +1159,62 @@ const HookLaboratoryPage: React.FC = () => {
                         </Card>
                     )}
 
+                    {/* Bulk Actions Bar */}
+                    {showBulkActions && selectedHooks.size > 0 && (
+                        <Card className="border-2 border-blue-500/20 bg-blue-50/50">
+                            <CardContent className="py-3">
+                                <div className="flex items-center justify-between">
+                                    <div className="flex items-center gap-3">
+                                        <span className="text-sm font-medium">
+                                            {selectedHooks.size} hook{selectedHooks.size > 1 ? 's' : ''} sélectionné{selectedHooks.size > 1 ? 's' : ''}
+                                        </span>
+                                    </div>
+                                    <div className="flex gap-2">
+                                        <Button
+                                            variant="outline"
+                                            size="sm"
+                                            onClick={bulkToggleFavorites}
+                                            className="flex items-center gap-2"
+                                        >
+                                            <Heart size={14} />
+                                            Basculer Favoris
+                                        </Button>
+                                        <Button
+                                            variant="outline"
+                                            size="sm"
+                                            onClick={exportSelectedHooks}
+                                            className="flex items-center gap-2"
+                                        >
+                                            <Share size={14} />
+                                            Exporter
+                                        </Button>
+                                        <Button
+                                            variant="destructive"
+                                            size="sm"
+                                            onClick={bulkDeleteHooks}
+                                            className="flex items-center gap-2"
+                                        >
+                                            <X size={14} />
+                                            Supprimer
+                                        </Button>
+                                        <Button
+                                            variant="ghost"
+                                            size="sm"
+                                            onClick={() => {
+                                                setSelectedHooks(new Set());
+                                                setShowBulkActions(false);
+                                            }}
+                                            className="flex items-center gap-2"
+                                        >
+                                            <X size={14} />
+                                            Annuler
+                                        </Button>
+                                    </div>
+                                </div>
+                            </CardContent>
+                        </Card>
+                    )}
+
                     {/* Library Content */}
                     {loadingLibrary ? (
                         <div className="flex justify-center py-12">
@@ -1064,7 +1246,13 @@ const HookLaboratoryPage: React.FC = () => {
                             {libraryHooks.map((hook) => (
                                 <Card key={hook.id} className={`hover:shadow-md transition-shadow ${libraryView === 'list' ? 'flex items-center' : ''}`}>
                                     <CardContent className={`p-4 ${libraryView === 'list' ? 'flex-1' : ''}`}>
-                                        <div className="flex items-start justify-between gap-3">
+                                        <div className="flex items-start gap-3">
+                                            <input
+                                                type="checkbox"
+                                                checked={selectedHooks.has(hook.id)}
+                                                onChange={() => toggleHookSelection(hook.id)}
+                                                className="mt-1 rounded border-gray-300"
+                                            />
                                             <div className="flex-1 min-w-0">
                                                 <div className="flex items-center gap-2 mb-2">
                                                     {hook.category && (
