@@ -47,18 +47,48 @@ export function AuditReport({ results }: AuditReportProps) {
 
                 {/* Strategy Tab */}
                 <TabsContent value="strategy" className="space-y-6">
-                    <Card className="border-2 border-primary/10 bg-primary/5">
-                        <CardHeader>
-                            <CardTitle className="text-2xl flex items-center gap-2">
-                                <Trophy className="text-yellow-500" /> Résumé Audit Stratégique
-                            </CardTitle>
-                        </CardHeader>
-                        <CardContent>
-                            <p className="text-lg leading-relaxed text-muted-foreground italic font-medium">
-                                "{results.summary}"
-                            </p>
-                        </CardContent>
-                    </Card>
+                    <div className="grid gap-6 md:grid-cols-2">
+                        <Card className="border-2 border-primary/10 bg-primary/5">
+                            <CardHeader>
+                                <CardTitle className="text-2xl flex items-center gap-2">
+                                    <Trophy className="text-yellow-500" /> Résumé Stratégique
+                                </CardTitle>
+                            </CardHeader>
+                            <CardContent>
+                                <p className="text-base leading-relaxed text-muted-foreground italic font-medium">
+                                    "{results.summary}"
+                                </p>
+                            </CardContent>
+                        </Card>
+
+                        {results.visual_specs && (
+                            <Card className="border-2 border-primary/5">
+                                <CardHeader>
+                                    <CardTitle className="text-lg flex items-center gap-2">
+                                        <Zap className="text-primary h-5 w-5" /> Analyse Visuelle (Crawl)
+                                    </CardTitle>
+                                </CardHeader>
+                                <CardContent className="space-y-4">
+                                    <div className="flex flex-wrap gap-2">
+                                        {results.visual_specs.colors.map((color, i) => (
+                                            <div key={i} className="flex items-center gap-1 bg-muted px-2 py-1 rounded-md text-[10px] uppercase font-mono">
+                                                <div className="h-3 w-3 rounded-full border" style={{ backgroundColor: color.startsWith('#') ? color : '#ccc' }} />
+                                                {color}
+                                            </div>
+                                        ))}
+                                    </div>
+                                    <div className="space-y-1">
+                                        <p className="text-[10px] font-bold uppercase text-muted-foreground">Polices détectées :</p>
+                                        <p className="text-sm font-semibold">{results.visual_specs.fonts.join(', ')}</p>
+                                    </div>
+                                    <div className="space-y-1">
+                                        <p className="text-[10px] font-bold uppercase text-muted-foreground">Ambiance actuelle :</p>
+                                        <Badge variant="secondary" className="bg-primary/10 text-primary hover:bg-primary/20">{results.visual_specs.vibe}</Badge>
+                                    </div>
+                                </CardContent>
+                            </Card>
+                        )}
+                    </div>
 
                     <div className="grid gap-6 md:grid-cols-2">
                         <Card>

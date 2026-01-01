@@ -1,4 +1,5 @@
 import { sendChatMessageSync } from './api';
+import { scraperService } from './scraperService';
 
 export interface ConsultantReport {
     score: number;
@@ -11,6 +12,11 @@ export interface ConsultantReport {
         priority: 'low' | 'medium' | 'high';
         estimated_effort: string;
     }>;
+    visual_specs?: {
+        colors: string[];
+        fonts: string[];
+        vibe: string;
+    };
     budget_estimate: {
         total: number;
         items: Array<{
@@ -80,11 +86,20 @@ export class AIConsultantService {
     }
 
     async analyzeSite(url: string): Promise<ConsultantReport> {
+        // 1. Scrape real site data
+        const scrapedData = await scraperService.scrapeSite(url);
+
         const prompt = `
             Tu es un Consultant Expert en Stratégie Digitale et Refonte de Site Web chez TrendStudio.
-            Analyse le site suivant (simule l'analyse de structure, SEO et UX basée sur l'URL) : ${url}
+            Tu viens de crawler le site : ${url}
             
-            Génère un rapport détaillé au format JSON suivant :
+            DONNÉES CRAWLÉES RÉELLES :
+            - TITRE : ${scrapedData.title}
+            - DESCRIPTION META : ${scrapedData.description}
+            - EN-TÊTES H1 : ${scrapedData.h1s.join(' | ') || 'Non détecté'}
+            - EXTRAIT DU CONTENU : ${scrapedData.content}
+
+            Sur la base de ces informations RÉELLES, analyse la structure, le SEO et l'UX du site.
             {
                 "score": 0-100,
                 "summary": "Résumé de l'état actuel",
@@ -108,7 +123,12 @@ export class AIConsultantService {
                         "pros": ["avantage 1", "avantage 2"],
                         "focus": "L'accent principal (ex: Vitesse, Conversion, Design)"
                     }
-                ]
+                ],
+                "visual_specs": {
+                    "colors": ["#primary", "#secondary"],
+                    "fonts": ["Font 1", "Font 2"],
+                    "vibe": "Description de l'ambiance visuelle actuelle (ex: Daté, Corporatif, Minimaliste)"
+                }
             }
             
             IMPORTANT: Propose AU MOINS 4 variantes distinctes (ex: 1. Full Brand Refresh, 2. Conversion Machine, 3. SEO Authority, 4. Tech Performance).
@@ -134,11 +154,19 @@ export class AIConsultantService {
     }
 
     async analyzeSEO(url: string): Promise<SEOReport> {
+        const scrapedData = await scraperService.scrapeSite(url);
+
         const prompt = `
             Tu es un Expert SEO Consultant Sénior chez TrendStudio.
             Analyse le SEO du site suivant : ${url}
             
-            Génère un rapport d'audit SEO complet au format JSON suivant :
+            DONNÉES CRAWLÉES RÉELLES :
+            - TITRE : ${scrapedData.title}
+            - DESCRIPTION META : ${scrapedData.description}
+            - EN-TÊTES H1 : ${scrapedData.h1s.join(' | ') || 'Non détecté'}
+            - EXTRAIT DU CONTENU : ${scrapedData.content}
+
+            Sur la base de ces informations RÉELLES, génère un rapport d'audit SEO complet au format JSON suivant :
             {
                 "scores": {
                     "global": 0-100,
@@ -148,11 +176,11 @@ export class AIConsultantService {
                 },
                 "keywords": [
                     { "keyword": "mot clé 1", "volume": 1200, "difficulty": 45, "relevance": 95 },
-                    ... (ajoute 5-8 mots-clés pertinents)
+                    ... (ajoute 5-8 mots-clés pertinents basés sur le contenu réel)
                 ],
                 "technical_issues": ["problème technique 1", ...],
                 "opportunities": ["opportunité 1", ...],
-                "semantic_strategy": "Description d'une stratégie de cocon sémantique efficace pour ce site"
+                "semantic_strategy": "Description d'une stratégie de cocon sémantique basée sur le contenu crawlée"
             }
             
             Réponds UNIQUEMENT avec le JSON. Sois précis et technique.

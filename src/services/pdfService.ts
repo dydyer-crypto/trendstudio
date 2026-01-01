@@ -78,14 +78,32 @@ export class PDFService {
         doc.setTextColor(secondaryColor[0], secondaryColor[1], secondaryColor[2]);
         const summaryLines = doc.splitTextToSize(report.summary, 170);
         doc.text(summaryLines, 20, yPos);
+        yPos += (summaryLines.length * 5) + 10;
 
-        yPos += (summaryLines.length * 5) + 15;
+        // Visual Specs
+        if (report.visual_specs) {
+            doc.setFontSize(12);
+            doc.setFont('helvetica', 'bold');
+            doc.setTextColor(primaryColor[0], primaryColor[1], primaryColor[2]);
+            doc.text('2. ANALYSE VISUELLE DU SITE ACTUEL', 20, yPos);
+            yPos += 8;
+
+            doc.setFontSize(10);
+            doc.setFont('helvetica', 'normal');
+            doc.setTextColor(secondaryColor[0], secondaryColor[1], secondaryColor[2]);
+            doc.text(`Ambiance détectée : ${report.visual_specs.vibe}`, 25, yPos);
+            yPos += 5;
+            doc.text(`Polices : ${report.visual_specs.fonts.join(', ')}`, 25, yPos);
+            yPos += 5;
+            doc.text(`Couleurs principales : ${report.visual_specs.colors.join(', ')}`, 25, yPos);
+            yPos += 12;
+        }
 
         // Redesign Variants
         doc.setFontSize(12);
         doc.setFont('helvetica', 'bold');
         doc.setTextColor(primaryColor[0], primaryColor[1], primaryColor[2]);
-        doc.text('2. VARIANTES STRATÉGIQUES PROPOSÉES', 20, yPos);
+        doc.text('3. VARIANTES STRATÉGIQUES PROPOSÉES', 20, yPos);
         yPos += 8;
 
         report.redesign_variants.forEach((v, idx) => {

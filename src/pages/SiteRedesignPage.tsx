@@ -38,8 +38,13 @@ export default function SiteRedesignPage() {
         setAuditResults(null);
         setShowWizard(false);
 
+        const toastId = toast.loading("Initialisation du crawler TrendStudio...");
+
         try {
+            toast.message("Scan des métadonnées et de la structure...", { id: toastId });
             const report = await aiConsultant.analyzeSite(url);
+
+            toast.message("Élaboration des 4 variantes stratégiques avec l'IA...", { id: toastId });
 
             // Add scores (mocked based on analysis or logic)
             const fullResults = {
@@ -66,10 +71,10 @@ export default function SiteRedesignPage() {
                 });
             }
 
-            toast.success("Analyse stratégique terminée ✨");
+            toast.success("Analyse stratégique et scan terminés ✨", { id: toastId });
         } catch (error) {
             console.error("Analysis error:", error);
-            toast.error("Échec de l'analyse par l'IA Consultant");
+            toast.error("Échec de l'analyse ou du scan du site", { id: toastId });
         } finally {
             setAnalyzing(false);
         }
