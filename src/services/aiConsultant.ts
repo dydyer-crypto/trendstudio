@@ -34,8 +34,30 @@ export interface SEOReport {
         relevance: number;
     }>;
     technical_issues: string[];
-    opportunities: string[];
     semantic_strategy: string;
+}
+
+export interface SocialMediaReport {
+    audit: {
+        current_state: string;
+        strengths: string[];
+        weaknesses: string[];
+    };
+    strategy: {
+        target_audience: string;
+        tone_of_voice: string;
+        content_pillars: Array<{
+            name: string;
+            description: string;
+            frequency: string;
+        }>;
+    };
+    best_platforms: Array<{
+        name: string;
+        reason: string;
+        estimated_growth: string;
+    }>;
+    viral_hooks: string[];
 }
 
 export class AIConsultantService {
@@ -132,6 +154,56 @@ export class AIConsultantService {
         } catch (error) {
             console.error('AI SEO analysis failed:', error);
             throw new Error('Échec de l\'analyse SEO par l\'IA Consultant');
+        }
+    }
+
+    async analyzeSocial(query: string, currentContext?: string): Promise<SocialMediaReport> {
+        const prompt = `
+            Tu es un Social Media Manager Expert chez TrendStudio.
+            Ton objectif est de créer une stratégie d'influence virale et professionnelle.
+            
+            Sujet/Profil à analyser : ${query}
+            Contexte additionnel : ${currentContext || 'Pas de contexte spécifique'}
+            
+            Génère un rapport de stratégie Social Media complet au format JSON suivant :
+            {
+                "audit": {
+                    "current_state": "Résumé de l'analyse du sujet",
+                    "strengths": ["point fort 1", ...],
+                    "weaknesses": ["point faible 1", ...]
+                },
+                "strategy": {
+                    "target_audience": "Description de l'audience cible",
+                    "tone_of_voice": "Détails sur l'identité verbale",
+                    "content_pillars": [
+                        { "name": "Pilier 1", "description": "...", "frequency": "X fois par semaine" },
+                        ...
+                    ]
+                },
+                "best_platforms": [
+                    { "name": "Instagram/TikTok/...", "reason": "...", "estimated_growth": "+30%/mois" },
+                    ...
+                ],
+                "viral_hooks": ["Accroche 1", "Accroche 2", ...]
+            }
+            
+            Réponds UNIQUEMENT avec le JSON. Sois ultra-créatif et axé sur la viralité (Shorts/Reels/TikTok).
+        `;
+
+        try {
+            const response = await sendChatMessageSync([
+                {
+                    role: 'user',
+                    parts: [{ text: prompt }]
+                }
+            ]);
+
+            const content = response.candidates[0].content.parts[0].text;
+            const jsonStr = content.replace(/```json|```/g, '').trim();
+            return JSON.parse(jsonStr);
+        } catch (error) {
+            console.error('AI Social analysis failed:', error);
+            throw new Error('Échec de l\'analyse Social Media par l\'IA Consultant');
         }
     }
 }
