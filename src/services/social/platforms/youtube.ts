@@ -171,4 +171,60 @@ export class YouTubeAPIClient {
         const data = await response.json();
         return data.items?.[0] || null;
     }
+
+    /**
+     * Get channel statistics
+     */
+    async getChannelStats(): Promise<{ followerCount: number; viewCount: number; videoCount: number }> {
+        const response = await fetch(
+            'https://www.googleapis.com/youtube/v3/channels?part=statistics&mine=true',
+            {
+                headers: {
+                    'Authorization': `Bearer ${this.credential.access_token}`,
+                },
+            }
+        );
+
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(`Failed to get channel stats: ${errorData.error?.message || response.statusText}`);
+        }
+
+        const data = await response.json();
+        const stats = data.items?.[0]?.statistics;
+
+        return {
+            followerCount: parseInt(stats?.subscriberCount || '0'),
+            viewCount: parseInt(stats?.viewCount || '0'),
+            videoCount: parseInt(stats?.videoCount || '0'),
+        };
+    }
+
+    /**
+     * Get statistics for a specific video
+     */
+    async getVideoStats(videoId: string): Promise<{ views: number; likes: number; comments: number }> {
+        const response = await fetch(
+            `https://www.googleapis.com/youtube/v3/videos?part=statistics&id=${videoId}`,
+            {
+                headers: {
+                    'Authorization': `Bearer ${this.credential.access_token}`,
+                },
+            }
+        );
+
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(`Failed to get video stats: ${errorData.error?.message || response.statusText}`);
+        }
+
+        const data = await response.json();
+        const stats = data.items?.[0]?.statistics;
+
+        return {
+            views: parseInt(stats?.viewCount || '0'),
+            likes: parseInt(stats?.likeCount || '0'),
+            comments: parseInt(stats?.commentCount || '0'),
+        };
+    }
 }
