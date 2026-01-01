@@ -1,12 +1,14 @@
 import React, { useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { 
-  Video, 
-  Image as ImageIcon, 
-  MessageSquare, 
-  FileText, 
-  Scissors, 
+import {
+  Video,
+  Image as ImageIcon,
+  MessageSquare,
+  FileText,
+  Scissors,
+  Building,
+  Settings,
   Menu,
   Moon,
   Sun,
@@ -20,7 +22,13 @@ import {
   TrendingUp,
   BarChart3,
   GraduationCap,
-  Users
+  Users,
+  Folder,
+  Lightbulb,
+  Layout,
+  Search,
+  Wand2,
+  RefreshCw
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
@@ -48,6 +56,12 @@ interface NavItem {
 }
 
 const getNavItems = (t: any): NavItem[] => [
+  { nameKey: 'nav.projects', path: '/projects', icon: <Folder className="w-5 h-5" /> },
+  { nameKey: 'nav.ideasLab', path: '/ideas-lab', icon: <Lightbulb className="w-5 h-5" /> },
+  { nameKey: 'nav.siteBuilder', path: '/site-builder', icon: <Layout className="w-5 h-5" /> },
+  { nameKey: 'nav.seoAnalysis', path: '/seo-analysis', icon: <Search className="w-5 h-5" /> },
+  { nameKey: 'nav.siteRedesign', path: '/site-redesign', icon: <RefreshCw className="w-5 h-5" /> },
+  { nameKey: 'nav.aioGenerator', path: '/generator-aio', icon: <Wand2 className="w-5 h-5" /> },
   { nameKey: 'nav.videoGenerator', path: '/video-generator', icon: <Video className="w-5 h-5" /> },
   { nameKey: 'nav.imageGenerator', path: '/image-generator', icon: <ImageIcon className="w-5 h-5" /> },
   { nameKey: 'nav.chatAssistant', path: '/chat-assistant', icon: <MessageSquare className="w-5 h-5" /> },
@@ -58,6 +72,8 @@ const getNavItems = (t: any): NavItem[] => [
   { nameKey: 'nav.analytics', path: '/analytics', icon: <BarChart3 className="w-5 h-5" /> },
   { nameKey: 'nav.tutorials', path: '/tutorials', icon: <GraduationCap className="w-5 h-5" /> },
   { nameKey: 'nav.affiliate', path: '/affiliate', icon: <Users className="w-5 h-5" /> },
+  { nameKey: 'nav.quotes', path: '/quotes', icon: <FileText className="w-5 h-5" /> },
+  { nameKey: 'nav.agency', path: '/agency', icon: <Building className="w-5 h-5" /> },
   { nameKey: 'nav.pricing', path: '/pricing', icon: <CreditCard className="w-5 h-5" /> },
 ];
 
@@ -152,6 +168,10 @@ export const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
           <DropdownMenuItem onClick={() => navigate('/orders')}>
             <ShoppingBag className="w-4 h-4 mr-2" />
             {t('nav.orderHistory')}
+          </DropdownMenuItem>
+          <DropdownMenuItem onClick={() => navigate('/settings/api')}>
+            <Settings className="w-4 h-4 mr-2" />
+            {t('nav.integrations')}
           </DropdownMenuItem>
           <DropdownMenuSeparator />
           <DropdownMenuItem onClick={handleSignOut}>

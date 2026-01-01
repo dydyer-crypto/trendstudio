@@ -23,7 +23,7 @@ export default function LoginPage() {
 
   const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!username || !password) {
       toast.error('Veuillez entrer votre nom d\'utilisateur et mot de passe');
       return;
@@ -48,7 +48,7 @@ export default function LoginPage() {
 
   const handleSignUp = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!username || !password) {
       toast.error('Veuillez entrer votre nom d\'utilisateur et mot de passe');
       return;
@@ -111,7 +111,7 @@ export default function LoginPage() {
               <TabsTrigger value="login">Connexion</TabsTrigger>
               <TabsTrigger value="register">Inscription</TabsTrigger>
             </TabsList>
-            
+
             <TabsContent value="login">
               <form onSubmit={handleSignIn} className="space-y-4">
                 <div className="space-y-2">
@@ -140,12 +140,15 @@ export default function LoginPage() {
                     className="text-sm xl:text-base"
                   />
                 </div>
+                <div className="text-right">
+                  <a href="/forgot-password" className="text-xs text-primary hover:underline">Mot de passe oublié ?</a>
+                </div>
                 <Button type="submit" className="w-full" disabled={loading}>
                   {loading ? 'Connexion en cours...' : 'Se connecter'}
                 </Button>
               </form>
             </TabsContent>
-            
+
             <TabsContent value="register">
               <form onSubmit={handleSignUp} className="space-y-4">
                 <div className="space-y-2">

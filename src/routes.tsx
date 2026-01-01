@@ -1,4 +1,16 @@
 import HomePage from './pages/HomePage';
+import ProjectsPage from './pages/ProjectsPage';
+import IdeasLabPage from './pages/IdeasLabPage';
+import SiteBuilderPage from './pages/SiteBuilderPage';
+import SiteEditorPage from './pages/SiteEditorPage';
+import SEOAnalysisPage from './pages/SEOAnalysisPage';
+import AIOPage from './pages/AIOPage';
+import SiteRedesignPage from './pages/SiteRedesignPage';
+import QuotesPage from './pages/QuotesPage';
+import AgencyPage from './pages/AgencyPage';
+import APISettingsPage from './pages/APISettingsPage';
+import ForgotPasswordPage from './pages/ForgotPasswordPage';
+import ResetPasswordPage from './pages/ResetPasswordPage';
 import VideoGeneratorPage from './pages/VideoGeneratorPage';
 import ImageGeneratorPage from './pages/ImageGeneratorPage';
 import ChatAssistantPage from './pages/ChatAssistantPage';
@@ -27,6 +39,55 @@ const routes: RouteConfig[] = [
     name: 'Home',
     path: '/',
     element: <HomePage />
+  },
+  {
+    name: 'Mes Projets',
+    path: '/projects',
+    element: <ProjectsPage />
+  },
+  {
+    name: "Laboratoire d'Idées",
+    path: '/ideas-lab',
+    element: <IdeasLabPage />
+  },
+  {
+    name: 'Constructeur de Site',
+    path: '/site-builder',
+    element: <SiteBuilderPage />
+  },
+  {
+    path: '/site-editor/:id',
+    element: <SiteEditorPage />
+  },
+  {
+    name: 'Analyse SEO',
+    path: '/seo-analysis',
+    element: <SEOAnalysisPage />
+  },
+  {
+    name: 'Générateur AIO',
+    path: '/generator-aio',
+    element: <AIOPage />
+  },
+  {
+    name: 'Refonte de Site',
+    path: '/site-redesign',
+    element: <SiteRedesignPage />
+  },
+  {
+    name: 'Devis IA',
+    path: '/quotes',
+    element: <QuotesPage />
+  },
+  {
+    name: 'Mode Agence',
+    path: '/agency',
+    element: <AgencyPage />
+  },
+  {
+    name: 'Integrations',
+    path: '/settings/api',
+    element: <APISettingsPage />
   },
   {
     name: 'Video Generator',
@@ -82,6 +143,18 @@ const routes: RouteConfig[] = [
     name: 'Tutoriels',
     path: '/tutorials',
     element: <TutorialsPage />
+  },
+  {
+    name: 'Forgot Password',
+    path: '/forgot-password',
+    element: <ForgotPasswordPage />,
+    visible: false
+  },
+  {
+    name: 'Reset Password',
+    path: '/reset-password',
+    element: <ResetPasswordPage />,
+    visible: false
   },
   {
     name: 'Login',

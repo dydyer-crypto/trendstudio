@@ -1,108 +1,84 @@
 # TrendStudio - AI Content Creation Studio
 
-## Project Info
+TrendStudio is a professional, all-in-one platform for content creators, agencies, and businesses. It unifies AI-powered content generation, project management, and web development into a single, seamless experience.
 
-TrendStudio is an all-in-one professional AI studio designed for content creators to generate, write, animate, and edit AI images and videos in one place. It aims to replace multiple AI tools with one powerful, easy-to-use AI creation platform for images, videos, scripts, and animation, focusing on viral content and social media growth.
+## 🚀 Key Features
 
-### Features
+### 🎨 Content Generation
+- **AI Video Generator**: Create videos up to 4 minutes (16:9, 9:16, 1:1).
+- **AI Image Generator**: High-quality text-to-image creation.
+- **AI Chat Assistant**: Intelligent assistant for scripting and ideas.
+- **Script to Video**: Automated scene breakdown and video creation.
+- **AIO Generator**: All-in-one generator for blog posts, pages, and product descriptions with SEO optimization.
 
-- **AI Video Generator**: Generate AI videos up to 4 minutes long with flexible aspect ratios (16:9, 9:16, 1:1)
-- **AI Image Generator**: Text-to-image and image-to-image generation with high-resolution output
-- **AI Chat Assistant**: Professional ChatGPT-style AI chat for writing scripts, creating viral content ideas, and improving prompts
-- **Script to Video**: Transform scripts into complete videos with automatic scene breakdown
-- **Video Editor**: Preview and download your generated videos
+### 🌐 Website & SEO
+- **Site Builder**: No-code website builder with professional templates.
+- **Site Redesign**: Analyze existing sites and get AI-powered migration plans.
+- **SEO Analysis**: Complete audit tools (On-page, keywords, backlinks).
 
-### Design
+### 💼 Business & Management
+- **Project Management**: Centralized dashboard for all your creative projects.
+- **Ideas Lab**: AI-driven brainstorming and trend analysis.
+- **AI Quotes**: Generate commercial quotes instantly based on project needs.
+- **Agency Mode**: Manage multiple clients, team members, and credit allocations.
+- **Integrations**: Connect third-party APIs (OpenAI, etc.) and configure webhooks.
 
-- **Primary Colors**: Deep purple (#6C5CE7) and electric blue (#0984E3)
-- **Dark Mode**: Dark gray (#1E1E2E) with vibrant accents
-- **Light Mode**: Clean white (#FFFFFF) with soft gray (#F5F6FA)
-- **Modern UI**: Rounded corners (8-12px), subtle shadows, smooth transitions
+## 🛠 Tech Stack
+- **Frontend**: React, TypeScript, Vite, Tailwind CSS, shadcn/ui
+- **Backend**: Supabase (Auth, Database, RLS, Edge Functions)
+- **State Management**: React Context / Hooks
+- **Routing**: React Router DOM
+- **I18n**: react-i18next (English & French support)
 
-## Project Directory
-
+## 📁 Project Structure
 ```
-├── README.md # Documentation
-├── components.json # Component library configuration
-├── index.html # Entry file
-├── package.json # Package management
-├── postcss.config.js # PostCSS configuration
-├── public # Static resources directory
-│   ├── favicon.png # Icon
-│   └── images # Image resources
-├── src # Source code directory
-│   ├── App.tsx # Entry file
-│   ├── components # Components directory
-│   ├── context # Context directory
-│   ├── db # Database configuration directory
-│   ├── hooks # Common hooks directory
-│   ├── index.css # Global styles
-│   ├── layout # Layout directory
-│   ├── lib # Utility library directory
-│   ├── main.tsx # Entry file
-│   ├── routes.tsx # Routing configuration
-│   ├── pages # Pages directory
-│   ├── services # Database interaction directory
-│   ├── types # Type definitions directory
-├── tsconfig.app.json # TypeScript frontend configuration file
-├── tsconfig.json # TypeScript configuration file
-├── tsconfig.node.json # TypeScript Node.js configuration file
-└── vite.config.ts # Vite configuration file
-```
-
-## Tech Stack
-
-Vite, TypeScript, React, Supabase
-
-## Development Guidelines
-
-### How to edit code locally?
-
-You can choose [VSCode](https://code.visualstudio.com/Download) or any IDE you prefer. The only requirement is to have Node.js and npm installed.
-
-### Environment Requirements
-
-```
-# Node.js ≥ 20
-# npm ≥ 10
-Example:
-# node -v   # v20.18.3
-# npm -v    # 10.8.2
+src/
+├── components/         # Reusable UI components
+│   ├── ui/             # shadcn/ui primitives
+│   ├── projects/       # Project management components
+│   ├── ideas/          # Ideas Lab components
+│   ├── sites/          # Site Builder components
+│   ├── seo/            # SEO tools components
+│   ├── aio/            # AIO Generator components
+│   ├── redesign/       # Site Redesign components
+│   ├── quotes/         # Quote generation components
+│   ├── agency/         # Agency mode components
+│   ├── settings/       # Integration settings
+│   └── auth/           # Authentication forms
+├── pages/              # Application pages
+├── db/                 # Supabase configuration
+├── contexts/           # Auth and global contexts
+├── locales/            # Translation files
+└── routes.tsx          # Route definitions
 ```
 
-### Installing Node.js on Windows
+## 🚀 Getting Started
 
-```
-# Step 1: Visit the Node.js official website: https://nodejs.org/, click download. The website will automatically suggest a suitable version (32-bit or 64-bit) for your system.
-# Step 2: Run the installer: Double-click the downloaded installer to run it.
-# Step 3: Complete the installation: Follow the installation wizard to complete the process.
-# Step 4: Verify installation: Open Command Prompt (cmd) or your IDE terminal, and type `node -v` and `npm -v` to check if Node.js and npm are installed correctly.
-```
+1.  **Install Dependencies**:
+    ```bash
+    npm install
+    ```
 
-### Installing Node.js on macOS
+2.  **Environment Setup**:
+    Create a `.env` file with your Supabase credentials:
+    ```env
+    VITE_SUPABASE_URL=your_project_url
+    VITE_SUPABASE_ANON_KEY=your_anon_key
+    ```
 
-```
-# Step 1: Using Homebrew (Recommended method): Open Terminal. Type the command `brew install node` and press Enter. If Homebrew is not installed, you need to install it first by running the following command in Terminal:
-/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
-Alternatively, use the official installer: Visit the Node.js official website. Download the macOS .pkg installer. Open the downloaded .pkg file and follow the prompts to complete the installation.
-# Step 2: Verify installation: Open Command Prompt (cmd) or your IDE terminal, and type `node -v` and `npm -v` to check if Node.js and npm are installed correctly.
-```
+3.  **Run Locally**:
+    ```bash
+    npm run dev
+    ```
 
-### After installation, follow these steps:
+## 🧪 Testing
 
-```
-# Step 1: Download the code package
-# Step 2: Extract the code package
-# Step 3: Open the code package with your IDE and navigate into the code directory
-# Step 4: In the IDE terminal, run the command to install dependencies: npm i
-# Step 5: In the IDE terminal, run the command to start the development server: npm run dev -- --host 127.0.0.1
-# Step 6: if step 5 failed, try this command to start the development server: npx vite --host 127.0.0.1
-```
+We recommend a comprehensive testing strategy covering:
+- **Unit Tests**: For utility functions and complex hook logic.
+- **Component Tests**: Using React Testing Library for critical UI components.
+- **E2E Tests**: Using Playwright/Cypress for User Flows (Login -> Create Project -> Generate Content).
 
-### How to develop backend services?
+See `TESTING.md` for detailed test scenarios.
 
-Configure environment variables and install relevant dependencies.If you need to use a database, please use the official version of Supabase.
-
-## Learn More
-
-You can also check the help documentation: Download and Building the app（ [https://intl.cloud.baidu.com/en/doc/MIAODA/s/download-and-building-the-app-en](https://intl.cloud.baidu.com/en/doc/MIAODA/s/download-and-building-the-app-en)）to learn more detailed content.
+## 📝 License
+Proprietary software. All rights reserved.
