@@ -1,17 +1,37 @@
-
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { SiteAnalyzer } from "@/components/redesign/SiteAnalyzer";
 import { AuditReport } from "@/components/redesign/AuditReport";
 import { MigrationWizard } from "@/components/redesign/MigrationWizard";
 import { supabase } from "@/db/supabase";
 import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "sonner";
+import { aiConsultant, type ConsultantReport } from "@/services/aiConsultant";
+import { crmService, type CRMWebhook } from "@/services/crm";
+import { Button } from "@/components/ui/button";
+import { Rocket, Send, ShieldCheck, Sparkles } from "lucide-react";
 
 export default function SiteRedesignPage() {
     const [analyzing, setAnalyzing] = useState(false);
     const [auditResults, setAuditResults] = useState<any | null>(null);
     const [showWizard, setShowWizard] = useState(false);
+    const [sendingToCRM, setSendingToCRM] = useState(false);
+    const [webhooks, setWebhooks] = useState<CRMWebhook[]>([]);
     const { user } = useAuth();
+
+    useEffect(() => {
+        if (user) {
+            loadWebhooks();
+        }
+    }, [user]);
+
+    const loadWebhooks = async () => {
+        try {
+            const hooks = await crmService.getWebhooks(user!.id);
+            setWebhooks(hooks);
+        } catch (error) {
+            console.error("Failed to load webhooks:", error);
+        }
+    };
 
     const handleAnalyze = async (url: string) => {
         setAnalyzing(true);
@@ -19,29 +39,19 @@ export default function SiteRedesignPage() {
         setShowWizard(false);
 
         try {
-            // Mock analysis delay
-            await new Promise(resolve => setTimeout(resolve, 3000));
+            const report = await aiConsultant.analyzeSite(url);
 
-            // Mock results
-            const mockResults = {
+            // Add scores (mocked based on analysis or logic)
+            const fullResults = {
+                ...report,
                 url,
-                performance: 65,
-                seo: 42,
-                mobile: 88,
-                security: 90,
-                issues: [
-                    "Temps de chargement lent (>3s)",
-                    "Balises H1 manquantes sur 3 pages",
-                    "Images non optimisées"
-                ],
-                recommendations: [
-                    "Migrer vers notre infrastructure optimisée",
-                    "Restructurer le contenu pour le SEO",
-                    "Utiliser le format WebP pour les images"
-                ]
+                performance: report.score,
+                seo: Math.min(100, report.score + 5),
+                mobile: Math.min(100, report.score - 10),
+                security: 95
             };
 
-            setAuditResults(mockResults);
+            setAuditResults(fullResults);
 
             // Save to DB
             if (user) {
@@ -49,27 +59,58 @@ export default function SiteRedesignPage() {
                     user_id: user.id,
                     url,
                     audit_type: 'full',
-                    results: mockResults,
-                    score: Math.round((65 + 42 + 88 + 90) / 4),
-                    issues: mockResults.issues,
-                    recommendations: mockResults.recommendations
+                    results: fullResults,
+                    score: fullResults.score,
+                    issues: report.weaknesses,
+                    recommendations: report.action_plan.map(a => a.title)
                 });
             }
 
+            toast.success("Analyse stratégique terminée ✨");
         } catch (error) {
             console.error("Analysis error:", error);
-            toast.error("Erreur lors de l'analyse");
+            toast.error("Échec de l'analyse par l'IA Consultant");
         } finally {
             setAnalyzing(false);
+        }
+    };
+
+    const handleValidateAndSend = async () => {
+        if (!auditResults) return;
+
+        if (webhooks.length === 0) {
+            toast.error("Aucun webhook CRM configuré (ex: Djaboo)");
+            return;
+        }
+
+        setSendingToCRM(true);
+        try {
+            const webhook = webhooks[0]; // Take the first one for demo
+            const success = await crmService.sendQuoteToCRM(webhook.url, auditResults);
+
+            if (success) {
+                toast.success("Devis envoyé au CRM Djaboo avec succès !");
+            } else {
+                toast.error("Erreur lors de l'envoi au CRM");
+            }
+        } catch (error) {
+            toast.error("Échec de la connexion au CRM");
+        } finally {
+            setSendingToCRM(false);
         }
     };
 
     return (
         <div className="container mx-auto p-6 space-y-12">
             <div className="text-center max-w-2xl mx-auto space-y-4">
-                <h1 className="text-4xl font-bold tracking-tight">Refonte de Site Intelligente</h1>
+                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 text-primary text-sm font-bold mb-4">
+                    <Sparkles size={16} /> IA Consultant v2.5
+                </div>
+                <h1 className="text-4xl font-extrabold tracking-tight bg-gradient-to-r from-primary to-purple-600 bg-clip-text text-transparent">
+                    Stratégie de Refonte Assistée
+                </h1>
                 <p className="text-xl text-muted-foreground">
-                    Analysez votre site actuel et laissez notre IA vous guider vers une version plus performante et moderne.
+                    Une analyse profonde par IA pour transformer votre site obsolète en machine de conversion.
                 </p>
             </div>
 
@@ -79,13 +120,31 @@ export default function SiteRedesignPage() {
                 <div className="space-y-8">
                     <AuditReport results={auditResults} />
 
-                    <div className="flex justify-center pt-8">
-                        <button
-                            onClick={() => setShowWizard(true)}
-                            className="bg-primary text-primary-foreground h-14 px-8 rounded-full text-lg font-semibold hover:bg-primary/90 transition-colors shadow-lg animate-in zoom-in duration-300"
+                    <div className="flex flex-col sm:flex-row justify-center gap-4 pt-8">
+                        <Button
+                            size="lg"
+                            variant="outline"
+                            className="h-14 px-8 rounded-full text-lg font-bold border-2 hover:bg-primary/5 gap-2"
+                            onClick={handleValidateAndSend}
+                            disabled={sendingToCRM}
                         >
-                            Démarrer la migration assistée
-                        </button>
+                            {sendingToCRM ? (
+                                <span className="animate-pulse">Envoi au CRM...</span>
+                            ) : (
+                                <>
+                                    <Send className="w-5 h-5" />
+                                    Valider & Envoyer au CRM (Djaboo)
+                                </>
+                            )}
+                        </Button>
+                        <Button
+                            size="lg"
+                            className="h-14 px-8 rounded-full text-lg font-bold shadow-xl gap-2 gradient-primary"
+                            onClick={() => setShowWizard(true)}
+                        >
+                            <Rocket className="w-5 h-5" />
+                            Lancer la Migration IA
+                        </Button>
                     </div>
                 </div>
             )}

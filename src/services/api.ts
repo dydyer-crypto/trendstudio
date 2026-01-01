@@ -44,9 +44,9 @@ export interface ChatResponse {
  */
 export const sendChatMessage = (messages: ChatMessage[]): EventSource => {
   const url = 'https://api-integrations.appmedo.com/app-8mth6gdsxz40/api-rLob8RdzAOl9/v1beta/models/gemini-2.5-flash:streamGenerateContent?alt=sse';
-  
+
   const eventSource = new EventSource(url);
-  
+
   // Send the request via POST (EventSource doesn't support POST directly, so we need a workaround)
   fetch(url.replace('?alt=sse', ''), {
     method: 'POST',
@@ -55,7 +55,7 @@ export const sendChatMessage = (messages: ChatMessage[]): EventSource => {
   }).catch(error => {
     console.error('Chat API error:', error);
   });
-  
+
   return eventSource;
 };
 
@@ -64,13 +64,13 @@ export const sendChatMessage = (messages: ChatMessage[]): EventSource => {
  */
 export const sendChatMessageSync = async (messages: ChatMessage[]): Promise<ChatResponse> => {
   const url = 'https://api-integrations.appmedo.com/app-8mth6gdsxz40/api-rLob8RdzAOl9/v1beta/models/gemini-2.5-flash:streamGenerateContent';
-  
+
   const response = await fetch(url, {
     method: 'POST',
     headers: getHeaders(),
     body: JSON.stringify({ contents: messages }),
   });
-  
+
   if (!response.ok) {
     const errorData = await response.json().catch(() => ({}));
     if (errorData.status === 999) {
@@ -78,7 +78,7 @@ export const sendChatMessageSync = async (messages: ChatMessage[]): Promise<Chat
     }
     throw new Error(`API request failed: ${response.statusText}`);
   }
-  
+
   return response.json();
 };
 
@@ -125,13 +125,13 @@ export interface VideoTaskResponse {
  */
 export const createTextToVideo = async (request: TextToVideoRequest): Promise<VideoTaskResponse> => {
   const url = 'https://api-integrations.appmedo.com/app-8mth6gdsxz40/api-DY8MX5oBQDGa/v1/videos/text2video';
-  
+
   const response = await fetch(url, {
     method: 'POST',
     headers: getHeaders(),
     body: JSON.stringify(request),
   });
-  
+
   if (!response.ok) {
     const errorData = await response.json().catch(() => ({}));
     if (errorData.status === 999) {
@@ -139,7 +139,7 @@ export const createTextToVideo = async (request: TextToVideoRequest): Promise<Vi
     }
     throw new Error(`Video generation failed: ${response.statusText}`);
   }
-  
+
   return response.json();
 };
 
@@ -147,13 +147,13 @@ export const createTextToVideo = async (request: TextToVideoRequest): Promise<Vi
  * Query text-to-video generation task status
  */
 export const queryTextToVideo = async (taskId: string): Promise<VideoTaskResponse> => {
-  const url = `https://api-integrations.appmedo.com/app-8fsm78964c1t/api-Q9KW2qRywm89/v1/videos/text2video/${taskId}`;
-  
+  const url = `https://api-integrations.appmedo.com/app-8mth6gdsxz40/api-DY8MX5oBQDGa/v1/videos/text2video/${taskId}`;
+
   const response = await fetch(url, {
     method: 'GET',
     headers: getHeaders(),
   });
-  
+
   if (!response.ok) {
     const errorData = await response.json().catch(() => ({}));
     if (errorData.status === 999) {
@@ -161,7 +161,7 @@ export const queryTextToVideo = async (taskId: string): Promise<VideoTaskRespons
     }
     throw new Error(`Failed to query video status: ${response.statusText}`);
   }
-  
+
   return response.json();
 };
 
@@ -181,13 +181,13 @@ export interface ImageToVideoRequest {
  */
 export const createImageToVideo = async (request: ImageToVideoRequest): Promise<VideoTaskResponse> => {
   const url = 'https://api-integrations.appmedo.com/app-8mth6gdsxz40/api-6LeB8Qe4rWGY/v1/videos/image2video';
-  
+
   const response = await fetch(url, {
     method: 'POST',
     headers: getHeaders(),
     body: JSON.stringify(request),
   });
-  
+
   if (!response.ok) {
     const errorData = await response.json().catch(() => ({}));
     if (errorData.status === 999) {
@@ -195,7 +195,7 @@ export const createImageToVideo = async (request: ImageToVideoRequest): Promise<
     }
     throw new Error(`Image-to-video generation failed: ${response.statusText}`);
   }
-  
+
   return response.json();
 };
 
@@ -203,13 +203,13 @@ export const createImageToVideo = async (request: ImageToVideoRequest): Promise<
  * Query image-to-video generation task status
  */
 export const queryImageToVideo = async (taskId: string): Promise<VideoTaskResponse> => {
-  const url = `https://api-integrations.appmedo.com/app-8fsm78964c1t/api-o9wN7X5E3nga/v1/videos/image2video/${taskId}`;
-  
+  const url = `https://api-integrations.appmedo.com/app-8mth6gdsxz40/api-6LeB8Qe4rWGY/v1/videos/image2video/${taskId}`;
+
   const response = await fetch(url, {
     method: 'GET',
     headers: getHeaders(),
   });
-  
+
   if (!response.ok) {
     const errorData = await response.json().catch(() => ({}));
     if (errorData.status === 999) {
@@ -217,7 +217,7 @@ export const queryImageToVideo = async (taskId: string): Promise<VideoTaskRespon
     }
     throw new Error(`Failed to query image-to-video status: ${response.statusText}`);
   }
-  
+
   return response.json();
 };
 
@@ -258,10 +258,10 @@ export interface ImageGenerationResponse {
  */
 export const generateImage = async (request: ImageGenerationRequest): Promise<ImageGenerationResponse> => {
   const url = 'https://api-integrations.appmedo.com/app-8mth6gdsxz40/api-Xa6JZ58oPMEa/v1beta/models/gemini-3-pro-image-preview:generateContent';
-  
+
   const controller = new AbortController();
   const timeoutId = setTimeout(() => controller.abort(), 300000); // 300s timeout
-  
+
   try {
     const response = await fetch(url, {
       method: 'POST',
@@ -269,9 +269,9 @@ export const generateImage = async (request: ImageGenerationRequest): Promise<Im
       body: JSON.stringify(request),
       signal: controller.signal,
     });
-    
+
     clearTimeout(timeoutId);
-    
+
     if (!response.ok) {
       const errorData = await response.json().catch(() => ({}));
       if (errorData.status === 999) {
@@ -279,7 +279,7 @@ export const generateImage = async (request: ImageGenerationRequest): Promise<Im
       }
       throw new Error(`Image generation failed: ${response.statusText}`);
     }
-    
+
     return response.json();
   } catch (error) {
     clearTimeout(timeoutId);
