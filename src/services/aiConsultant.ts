@@ -20,6 +20,24 @@ export interface ConsultantReport {
     };
 }
 
+export interface SEOReport {
+    scores: {
+        global: number;
+        on_page: number;
+        technical: number;
+        content: number;
+    };
+    keywords: Array<{
+        keyword: string;
+        volume: number;
+        difficulty: number;
+        relevance: number;
+    }>;
+    technical_issues: string[];
+    opportunities: string[];
+    semantic_strategy: string;
+}
+
 export class AIConsultantService {
     private static instance: AIConsultantService;
 
@@ -72,6 +90,48 @@ export class AIConsultantService {
         } catch (error) {
             console.error('AI Consultant analysis failed:', error);
             throw new Error('Échec de l\'analyse par l\'IA Consultant');
+        }
+    }
+
+    async analyzeSEO(url: string): Promise<SEOReport> {
+        const prompt = `
+            Tu es un Expert SEO Consultant Sénior chez TrendStudio.
+            Analyse le SEO du site suivant : ${url}
+            
+            Génère un rapport d'audit SEO complet au format JSON suivant :
+            {
+                "scores": {
+                    "global": 0-100,
+                    "on_page": 0-100,
+                    "technical": 0-100,
+                    "content": 0-100
+                },
+                "keywords": [
+                    { "keyword": "mot clé 1", "volume": 1200, "difficulty": 45, "relevance": 95 },
+                    ... (ajoute 5-8 mots-clés pertinents)
+                ],
+                "technical_issues": ["problème technique 1", ...],
+                "opportunities": ["opportunité 1", ...],
+                "semantic_strategy": "Description d'une stratégie de cocon sémantique efficace pour ce site"
+            }
+            
+            Réponds UNIQUEMENT avec le JSON. Sois précis et technique.
+        `;
+
+        try {
+            const response = await sendChatMessageSync([
+                {
+                    role: 'user',
+                    parts: [{ text: prompt }]
+                }
+            ]);
+
+            const content = response.candidates[0].content.parts[0].text;
+            const jsonStr = content.replace(/```json|```/g, '').trim();
+            return JSON.parse(jsonStr);
+        } catch (error) {
+            console.error('AI SEO analysis failed:', error);
+            throw new Error('Échec de l\'analyse SEO par l\'IA Consultant');
         }
     }
 }
