@@ -26,6 +26,9 @@ import CalendarPage from './pages/CalendarPage';
 import TrendsPage from './pages/TrendsPage';
 import AnalyticsPage from './pages/AnalyticsPage';
 import TutorialsPage from './pages/TutorialsPage';
+import CompetitorPage from './pages/CompetitorPage';
+import BrandStudioPage from './pages/BrandStudioPage';
+import HookLaboratoryPage from './pages/HookLaboratoryPage';
 import type { ReactNode } from 'react';
 
 interface RouteConfig {
@@ -179,6 +182,21 @@ const routes: RouteConfig[] = [
     path: '/orders',
     element: <OrderHistoryPage />,
     visible: false
+  },
+  {
+    name: 'Espion IA',
+    path: '/competitor',
+    element: <CompetitorPage />
+  },
+  {
+    name: 'Brand Studio',
+    path: '/settings/brand',
+    element: <BrandStudioPage />
+  },
+  {
+    name: 'Laboratoire de Hooks',
+    path: '/hooks',
+    element: <HookLaboratoryPage />
   }
 ];
 

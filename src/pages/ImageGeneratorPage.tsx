@@ -1,22 +1,25 @@
-import React, { useState, useRef } from 'react';
-import { Image as ImageIcon, Loader2, Download, Upload, X } from 'lucide-react';
+import React, { useState, useRef, useEffect } from 'react';
+import { Image as ImageIcon, Loader2, Download, Upload, X, Palette } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/hooks/use-toast';
 import { generateImage, extractImageFromMarkdown, type ImageGenerationRequest } from '@/services/api';
 import { uploadImage, fileToBase64, formatFileSize } from '@/utils/imageUpload';
 import { Progress } from '@/components/ui/progress';
+import { useAuth } from '@/contexts/AuthContext';
+import { brandKitService, type BrandKit } from '@/services/brandKitService';
 
 type AspectRatio = '1:1' | '9:16' | '16:9' | '4:5';
 
 const ImageGeneratorPage: React.FC = () => {
   const { toast } = useToast();
   const fileInputRef = useRef<HTMLInputElement>(null);
-  
+
   const [mode, setMode] = useState<'text' | 'image'>('text');
   const [prompt, setPrompt] = useState('');
   const [aspectRatio, setAspectRatio] = useState<AspectRatio>('1:1');
@@ -26,6 +29,24 @@ const ImageGeneratorPage: React.FC = () => {
   const [isUploading, setIsUploading] = useState(false);
   const [isGenerating, setIsGenerating] = useState(false);
   const [generatedImage, setGeneratedImage] = useState<string | null>(null);
+  const [activeBrandKit, setActiveBrandKit] = useState<BrandKit | null>(null);
+  const [useBrandKit, setUseBrandKit] = useState(true);
+
+  // Load active brand kit on component mount
+  useEffect(() => {
+    if (user) {
+      loadActiveBrandKit();
+    }
+  }, [user]);
+
+  const loadActiveBrandKit = async () => {
+    try {
+      const kit = await brandKitService.getActiveBrandKit(user!.id);
+      setActiveBrandKit(kit);
+    } catch (error) {
+      console.error('Failed to load brand kit:', error);
+    }
+  };
 
   const handleFileSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -38,7 +59,7 @@ const ImageGeneratorPage: React.FC = () => {
       const result = await uploadImage(file, setUploadProgress);
       setUploadedFile(file);
       setUploadedImageUrl(result.url);
-      
+
       if (result.compressed) {
         toast({
           title: 'Image Uploaded & Compressed',
@@ -112,18 +133,54 @@ const ImageGeneratorPage: React.FC = () => {
         });
       }
 
-      // Add prompt with aspect ratio hint
-      const promptWithRatio = `${prompt.trim()}. Aspect ratio: ${aspectRatio}`;
+      // Add prompt with aspect ratio hint and brand kit integration
+      let enhancedPrompt = `${prompt.trim()}. Aspect ratio: ${aspectRatio}`;
+
+      // Integrate brand kit if enabled and available
+      if (useBrandKit && activeBrandKit) {
+        const brandContext = [];
+
+        // Add color palette context
+        if (activeBrandKit.primary_color && activeBrandKit.secondary_color && activeBrandKit.accent_color) {
+          brandContext.push(`Use color palette: primary ${activeBrandKit.primary_color}, secondary ${activeBrandKit.secondary_color}, accent ${activeBrandKit.accent_color}`);
+        }
+
+        // Add brand voice/style context
+        if (activeBrandKit.brand_voice?.tone?.length > 0) {
+          brandContext.push(`Style: ${activeBrandKit.brand_voice.tone.join(', ')}`);
+        }
+
+        // Add brand keywords
+        if (activeBrandKit.brand_voice?.keywords?.length > 0) {
+          brandContext.push(`Incorporate these brand elements: ${activeBrandKit.brand_voice.keywords.join(', ')}`);
+        }
+
+        // Add typography hint if available
+        if (activeBrandKit.typography?.primary) {
+          brandContext.push(`Typography style: ${activeBrandKit.typography.primary} font family`);
+        }
+
+        if (brandContext.length > 0) {
+          enhancedPrompt += `. Brand guidelines: ${brandContext.join('. ')}.`;
+        }
+
+        // Show brand kit notification
+        toast({
+          title: '🎨 Charte appliquée !',
+          description: `Votre kit "${activeBrandKit.name}" est automatiquement intégré.`,
+        });
+      }
+
       request.contents[0].parts.push({
-        text: promptWithRatio,
+        text: enhancedPrompt,
       });
 
       const response = await generateImage(request);
-      
+
       if (response.status === 0 && response.candidates?.[0]?.content?.parts?.[0]?.text) {
         const markdown = response.candidates[0].content.parts[0].text;
         const base64Image = extractImageFromMarkdown(markdown);
-        
+
         if (base64Image) {
           setGeneratedImage(`data:image/png;base64,${base64Image}`);
           toast({
@@ -254,6 +311,45 @@ const ImageGeneratorPage: React.FC = () => {
               />
               <p className="text-xs text-muted-foreground">{prompt.length} / 2000 characters</p>
             </div>
+
+            {/* Brand Kit Integration */}
+            {activeBrandKit && (
+              <div className="space-y-3 p-4 bg-primary/5 rounded-lg border border-primary/10">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <Palette className="w-4 h-4 text-primary" />
+                    <Label className="font-medium">Intégration Brand Kit</Label>
+                    <Badge variant="secondary" className="text-xs">
+                      {activeBrandKit.name}
+                    </Badge>
+                  </div>
+                  <div className="flex items-center gap-2 text-sm">
+                    <input
+                      type="checkbox"
+                      id="useBrandKit"
+                      checked={useBrandKit}
+                      onChange={(e) => setUseBrandKit(e.target.checked)}
+                      className="rounded"
+                    />
+                    <label htmlFor="useBrandKit" className="cursor-pointer">
+                      Appliquer automatiquement
+                    </label>
+                  </div>
+                </div>
+
+                {useBrandKit && (
+                  <div className="text-xs text-muted-foreground space-y-1">
+                    <p>• Couleurs: {activeBrandKit.primary_color}, {activeBrandKit.secondary_color}, {activeBrandKit.accent_color}</p>
+                    {activeBrandKit.brand_voice?.tone?.length > 0 && (
+                      <p>• Ton: {activeBrandKit.brand_voice.tone.join(', ')}</p>
+                    )}
+                    {activeBrandKit.brand_voice?.keywords?.length > 0 && (
+                      <p>• Mots-clés: {activeBrandKit.brand_voice.keywords.join(', ')}</p>
+                    )}
+                  </div>
+                )}
+              </div>
+            )}
 
             {/* Aspect Ratio */}
             <div className="space-y-2">

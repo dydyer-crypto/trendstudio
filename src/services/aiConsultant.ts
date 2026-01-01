@@ -294,7 +294,98 @@ export class AIConsultantService {
             console.error('AI AIO Generation failed:', error);
             throw new Error('Échec de la génération de contenu AIO');
         }
-    }
-}
+    async generateCalendarChunk(strategy: any, days: number = 30, existingTitles: string[] = []): Promise < any[] > {
+            const prompt = `
+            Tu es un Social Media Manager Senior Expert chez TrendStudio.
+            Basé sur la stratégie sociale suivante : ${JSON.stringify(strategy)}
+            
+            Génère un planning de publication COMPLET pour les ${days} prochains jours.
+            
+            CONTEXTE IMPORTANT :
+            Les titres suivants ont déjà été planifiés ou publiés : ${existingTitles.join(', ') || 'Aucun pour le moment'}.
+            NE REPRODUIS PAS ces titres. Propose de nouvelles idées fraîches et complémentaires qui font avancer la narration de la marque.
+            
+            LE PLANNING DOIT ÊTRE VARIÉ (Alterner Educatif, Promotionnel, Engagement, Divertissement).
+            Utilise les plateformes pertinentes définies dans la stratégie.
+            
+            Réponds UNIQUEMENT avec un tableau JSON de ${days} objets suivant ce format :
+            {
+                "day_offset": 1 à ${days},
+                "title": "Titre accrocheur du post",
+                "platform": "youtube" | "instagram" | "tiktok" | "twitter" | "linkedin",
+                "content_type": "video" | "image" | "text",
+                "status": "scheduled"
+            }
+            
+            Sois créatif et stratégique pour maximiser la viralité. Assure-toi que les titres sont prêts à être utilisés.
+        `;
 
-export const aiConsultant = AIConsultantService.getInstance();
+            const response = await this.callAI(prompt);
+            return JSON.parse(response);
+        }
+
+    async analyzeCompetitor(competitorUrl: string, targetUrl ?: string): Promise < any > {
+            const scrapedData = await scraperService.scrapeSite(competitorUrl);
+            const prompt = `
+            Tu es un Consultant en Stratégie de Croissance chez TrendStudio.
+            Analyse le site du concurrent : ${competitorUrl}
+            ${targetUrl ? `Compare-le au site de notre client : ${targetUrl}` : ''}
+            
+            DONNÉES DU CONCURRENT :
+            - Titre : ${scrapedData.title}
+            - Description : ${scrapedData.description}
+            - Contenu : ${scrapedData.content.substring(0, 2000)}
+            
+            Génère une analyse concurrentielle JSON :
+            {
+                "competitor_name": "Nom du concurrent",
+                "strengths": ["...", "..."],
+                "weaknesses": ["...", "..."],
+                "content_strategy": "Description de leur stratégie",
+                "traffic_sources_estimation": "...",
+                "kill_points": ["Comment faire mieux qu'eux 1", "..."],
+                "recommended_action_plan": ["Action 1", "..."]
+            }
+            Réponds uniquement par JSON.
+        `;
+            const response = await this.callAI(prompt);
+            return JSON.parse(response);
+        }
+
+    async generateViralHooks(topic: string, platform: string): Promise < any[] > {
+            const prompt = `
+            Tu es un Copywriter Viral expert en ${platform}.
+            Génère 10 variations d'accroches (Hooks) ultra-percutantes pour le sujet : "${topic}".
+            
+            Format de sortie JSON:
+            [
+                { "hook": "Accroche 1", "type": "Curiosité | Peur | Gain | Preuve Sociale | Contre-intuitif", "explanation": "Pourquoi ça marche" },
+                ...
+            ]
+            Réponds uniquement par JSON.
+        `;
+            const response = await this.callAI(prompt);
+            return JSON.parse(response);
+        }
+
+    async generateCommentReplies(postContent: string, comment: string): Promise < any[] > {
+            const prompt = `
+            Tu es un Social Media Manager chez TrendStudio.
+            Post original : "${postContent}"
+            Commentaire client : "${comment}"
+            
+            Génère 3 options de réponses (Ton : Professionnel, Amical, Humoristique).
+            Format de sortie JSON:
+            [
+                { "tone": "Professionnel", "content": "..." },
+                { "tone": "Amical", "content": "..." },
+                { "tone": "Humoristique", "content": "..." }
+            ]
+            Réponds uniquement par JSON.
+        `;
+            const response = await this.callAI(prompt);
+            return JSON.parse(response);
+        }
+    }
+
+    export const aiConsultant = AIConsultantService.getInstance();

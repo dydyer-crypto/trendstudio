@@ -19,13 +19,59 @@ import {
 } from "lucide-react";
 import type { ConsultantReport } from "@/services/aiConsultant";
 import { pdfService } from "@/services/pdfService";
+import { crmService } from "@/services/crm";
+import { useAuth } from "@/contexts/AuthContext";
+import { useState } from "react";
+import { toast } from "sonner";
+import { Send, CheckCircle } from "lucide-react";
 
 interface AuditReportProps {
     results: ConsultantReport & { url: string; performance: number; seo: number; mobile: number; security: number };
 }
 
 export function AuditReport({ results }: AuditReportProps) {
+    const { user } = useAuth();
+    const [sendingCRM, setSendingCRM] = useState(false);
+    const [crmSent, setCrmSent] = useState(false);
+
     if (!results) return null;
+
+    const handleSendToCRM = async () => {
+        if (!user) {
+            toast.error("Veuillez vous connecter pour envoyer au CRM");
+            return;
+        }
+
+        setSendingCRM(true);
+        try {
+            const webhooks = await crmService.getWebhooks(user.id);
+            const activeHooks = webhooks.filter(h => h.is_active);
+
+            if (activeHooks.length === 0) {
+                toast.error("Aucun webhook CRM actif configuré dans vos paramètres.");
+                setSendingCRM(false);
+                return;
+            }
+
+            let success = false;
+            for (const hook of activeHooks) {
+                const res = await crmService.sendQuoteToCRM(hook.url, results);
+                if (res) success = true;
+            }
+
+            if (success) {
+                toast.success("Devis envoyé au CRM avec succès ! 🚀");
+                setCrmSent(true);
+            } else {
+                toast.error("Erreur lors de l'envoi au CRM");
+            }
+        } catch (error) {
+            console.error(error);
+            toast.error("Une erreur est survenue");
+        } finally {
+            setSendingCRM(false);
+        }
+    };
 
     return (
         <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
@@ -234,6 +280,36 @@ export function AuditReport({ results }: AuditReportProps) {
                                 </CardHeader>
                                 <CardContent className="space-y-4">
                                     <p className="text-sm">Ce rapport peut être directement converti en devis officiel et envoyé à votre CRM Djaboo.</p>
+                                    <Button
+                                        className="w-full gap-2 gradient-primary py-6 text-lg font-bold shadow-xl"
+                                        onClick={handleSendToCRM}
+                                        disabled={sendingCRM || crmSent}
+                                    >
+                                        {sendingCRM ? (
+                                            "Envoi en cours..."
+                                        ) : crmSent ? (
+                                            <><CheckCircle className="h-5 w-5" /> Envoyé au CRM</>
+                                        ) : (
+                                            <><Send className="h-5 w-5" /> Valider & Envoyer au CRM</>
+                                        )}
+                                    </Button>
+                                    {crmSent && (
+                                        <p className="text-[10px] text-center text-primary-foreground/70 italic">
+                                            Le statut de ce devis est désormais "Accepté" dans votre CRM.
+                                        </p>
+                                    )}
+                                    {!crmSent && (
+                                        <div className="pt-2 border-t border-primary/10">
+                                            <a
+                                                href="https://auth.djaboo.app/register?aff=Ca4mJWLQeatr"
+                                                target="_blank"
+                                                rel="noopener noreferrer"
+                                                className="text-[10px] text-center block text-muted-foreground hover:text-primary transition-colors flex items-center justify-center gap-1"
+                                            >
+                                                Pas encore de CRM ? Créez votre compte Djaboo ici <ExternalLink size={10} />
+                                            </a>
+                                        </div>
+                                    )}
                                 </CardContent>
                             </Card>
                         </div>

@@ -4,6 +4,7 @@ import { Video, Image as ImageIcon, MessageSquare, FileText, Sparkles, Zap, Wand
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { useAuth } from '@/contexts/AuthContext';
+import { Footer } from '@/components/common/Footer';
 
 const HomePage: React.FC = () => {
   const { user } = useAuth();
@@ -96,17 +97,17 @@ const HomePage: React.FC = () => {
               <Sparkles className="w-4 h-4" />
               <span>Studio de création de contenu IA tout-en-un</span>
             </div>
-            
+
             <h1 className="text-4xl xl:text-6xl font-bold leading-tight">
               Créez du contenu viral avec des{' '}
               <span className="gradient-text">outils IA puissants</span>
             </h1>
-            
+
             <p className="text-lg xl:text-xl text-muted-foreground max-w-2xl mx-auto">
-              Générez, écrivez, animez et éditez des images et vidéos IA en un seul endroit. 
+              Générez, écrivez, animez et éditez des images et vidéos IA en un seul endroit.
               Remplacez plusieurs outils IA par une plateforme puissante conçue pour les créateurs de contenu.
             </p>
-            
+
             <div className="flex flex-col xl:flex-row items-center justify-center gap-4">
               <Link to="/video-generator">
                 <Button size="lg" className="gradient-primary text-white gap-2 shadow-lg hover:shadow-xl transition-all">
@@ -209,6 +210,8 @@ const HomePage: React.FC = () => {
           </div>
         </div>
       </section>
+
+      <Footer />
     </div>
   );
 };

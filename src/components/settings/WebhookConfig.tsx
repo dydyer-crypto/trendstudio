@@ -15,6 +15,8 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Network, Plus, Trash2 } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
+import { supabase } from "@/db/supabase";
+import { useAuth } from "@/contexts/AuthContext";
 
 interface Webhook {
     id: string;
@@ -29,13 +31,56 @@ interface WebhookConfigProps {
 }
 
 export function WebhookConfig({ webhooks }: WebhookConfigProps) {
+    const { user } = useAuth();
     const [isDialogOpen, setIsDialogOpen] = useState(false);
     const [newHook, setNewHook] = useState({ name: '', url: '' });
 
-    const handleAdd = () => {
-        // Mock add logic
-        toast.success("Webhook ajouté");
-        setIsDialogOpen(false);
+    const handleAdd = async () => {
+        if (!user) return;
+        if (!newHook.name || !newHook.url) {
+            toast.error("Veuillez remplir tous les champs");
+            return;
+        }
+
+        try {
+            const { error } = await supabase.from('webhooks').insert({
+                user_id: user.id,
+                name: newHook.name,
+                url: newHook.url,
+                is_active: true,
+                events: ['quote.accepted', 'audit.completed']
+            });
+
+            if (error) throw error;
+            toast.success("Webhook configuré avec succès !");
+            setIsDialogOpen(false);
+            setNewHook({ name: '', url: '' });
+            window.location.reload(); // Refresh to show new hook
+        } catch (error) {
+            toast.error("Erreur lors de l'ajout du webhook");
+        }
+    };
+
+    const handleDelete = async (id: string) => {
+        try {
+            const { error } = await supabase.from('webhooks').delete().eq('id', id);
+            if (error) throw error;
+            toast.success("Webhook supprimé");
+            window.location.reload();
+        } catch (error) {
+            toast.error("Erreur de suppression");
+        }
+    };
+
+    const toggleStatus = async (id: string, currentStatus: boolean) => {
+        try {
+            const { error } = await supabase.from('webhooks').update({ is_active: !currentStatus }).eq('id', id);
+            if (error) throw error;
+            toast.success("Statut mis à jour");
+            window.location.reload();
+        } catch (error) {
+            toast.error("Erreur de mise à jour");
+        }
     };
 
     return (
@@ -88,10 +133,20 @@ export function WebhookConfig({ webhooks }: WebhookConfigProps) {
                                     <TableCell className="font-medium">{hook.name}</TableCell>
                                     <TableCell className="font-mono text-xs max-w-[200px] truncate">{hook.url}</TableCell>
                                     <TableCell>
-                                        <Switch checked={hook.is_active} />
+                                        <Switch
+                                            checked={hook.is_active}
+                                            onCheckedChange={() => toggleStatus(hook.id, hook.is_active)}
+                                        />
                                     </TableCell>
                                     <TableCell className="text-right">
-                                        <Button variant="ghost" size="icon" className="text-destructive"><Trash2 className="h-4 w-4" /></Button>
+                                        <Button
+                                            variant="ghost"
+                                            size="icon"
+                                            className="text-destructive"
+                                            onClick={() => handleDelete(hook.id)}
+                                        >
+                                            <Trash2 className="h-4 w-4" />
+                                        </Button>
                                     </TableCell>
                                 </TableRow>
                             ))

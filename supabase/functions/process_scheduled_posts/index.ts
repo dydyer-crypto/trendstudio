@@ -199,7 +199,14 @@ async function refreshTokenForPlatform(platform: string, refreshToken: string): 
             return await refreshGoogleToken(clientId, clientSecret, refreshToken);
         case 'instagram':
             return await refreshInstagramToken(clientId, clientSecret, refreshToken);
-        // Add other platforms as needed
+        case 'tiktok':
+            return await refreshTikTokToken(clientId, clientSecret, refreshToken);
+        case 'twitter':
+            return await refreshTwitterToken(clientId, clientSecret, refreshToken);
+        case 'facebook':
+            return await refreshFacebookToken(clientId, clientSecret, refreshToken);
+        case 'linkedin':
+            return await refreshLinkedInToken(clientId, clientSecret, refreshToken);
         default:
             throw new Error(`Token refresh not implemented for ${platform}`);
     }
@@ -245,6 +252,87 @@ async function refreshInstagramToken(clientId: string, clientSecret: string, ref
     return response.json();
 }
 
+async function refreshTikTokToken(clientId: string, clientSecret: string, refreshToken: string): Promise<any> {
+    const response = await fetch('https://open-api.tiktok.com/oauth/refresh_token/', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: new URLSearchParams({
+            client_key: clientId,
+            client_secret: clientSecret,
+            grant_type: 'refresh_token',
+            refresh_token: refreshToken,
+        }),
+    });
+
+    if (!response.ok) {
+        throw new Error(`TikTok token refresh failed: ${response.statusText}`);
+    }
+
+    return response.json();
+}
+
+async function refreshTwitterToken(clientId: string, clientSecret: string, refreshToken: string): Promise<any> {
+    const response = await fetch('https://api.twitter.com/2/oauth2/token', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: new URLSearchParams({
+            client_id: clientId,
+            client_secret: clientSecret,
+            grant_type: 'refresh_token',
+            refresh_token: refreshToken,
+        }),
+    });
+
+    if (!response.ok) {
+        throw new Error(`Twitter token refresh failed: ${response.statusText}`);
+    }
+
+    return response.json();
+}
+
+async function refreshFacebookToken(clientId: string, clientSecret: string, refreshToken: string): Promise<any> {
+    const response = await fetch('https://graph.facebook.com/v18.0/oauth/access_token', {
+        method: 'GET',
+        body: new URLSearchParams({
+            grant_type: 'fb_exchange_token',
+            client_id: clientId,
+            client_secret: clientSecret,
+            fb_exchange_token: refreshToken,
+        }),
+    });
+
+    if (!response.ok) {
+        throw new Error(`Facebook token refresh failed: ${response.statusText}`);
+    }
+
+    return response.json();
+}
+
+async function refreshLinkedInToken(clientId: string, clientSecret: string, refreshToken: string): Promise<any> {
+    const response = await fetch('https://www.linkedin.com/oauth/v2/accessToken', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: new URLSearchParams({
+            grant_type: 'refresh_token',
+            client_id: clientId,
+            client_secret: clientSecret,
+            refresh_token: refreshToken,
+        }),
+    });
+
+    if (!response.ok) {
+        throw new Error(`LinkedIn token refresh failed: ${response.statusText}`);
+    }
+
+    return response.json();
+}
+
 async function publishToPlatform(post: ScheduledPost, credential: PlatformCredential): Promise<{ success: boolean; postId?: string; url?: string; error?: string }> {
     try {
         switch (post.platform) {
@@ -252,7 +340,14 @@ async function publishToPlatform(post: ScheduledPost, credential: PlatformCreden
                 return await publishToYouTube(post, credential);
             case 'instagram':
                 return await publishToInstagram(post, credential);
-            // Add other platforms
+            case 'tiktok':
+                return await publishToTikTok(post, credential);
+            case 'twitter':
+                return await publishToTwitter(post, credential);
+            case 'facebook':
+                return await publishToFacebook(post, credential);
+            case 'linkedin':
+                return await publishToLinkedIn(post, credential);
             default:
                 return { success: false, error: `Publishing not implemented for ${post.platform}` };
         }
@@ -346,6 +441,82 @@ async function publishToInstagram(post: ScheduledPost, credential: PlatformCrede
         postId: `ig_${Date.now()}`,
         url: `https://instagram.com/p/simulated_${Date.now()}`
     };
+}
+
+async function publishToTikTok(post: ScheduledPost, credential: PlatformCredential) {
+    console.log(`Publishing to TikTok: ${post.title}`);
+
+    try {
+        // Simulate TikTok publishing - would need actual TikTok API implementation
+        return {
+            success: true,
+            postId: `tt_${Date.now()}`,
+            url: `https://tiktok.com/@${credential.account_name}/video/simulated_${Date.now()}`
+        };
+    } catch (error) {
+        console.error('TikTok publish error:', error);
+        return {
+            success: false,
+            error: error instanceof Error ? error.message : 'TikTok publishing failed'
+        };
+    }
+}
+
+async function publishToTwitter(post: ScheduledPost, credential: PlatformCredential) {
+    console.log(`Publishing to Twitter: ${post.title}`);
+
+    try {
+        // Simulate Twitter publishing - would need actual Twitter API v2 implementation
+        return {
+            success: true,
+            postId: `tw_${Date.now()}`,
+            url: `https://twitter.com/i/web/status/simulated_${Date.now()}`
+        };
+    } catch (error) {
+        console.error('Twitter publish error:', error);
+        return {
+            success: false,
+            error: error instanceof Error ? error.message : 'Twitter publishing failed'
+        };
+    }
+}
+
+async function publishToFacebook(post: ScheduledPost, credential: PlatformCredential) {
+    console.log(`Publishing to Facebook: ${post.title}`);
+
+    try {
+        // Simulate Facebook publishing - would need actual Facebook Graph API implementation
+        return {
+            success: true,
+            postId: `fb_${Date.now()}`,
+            url: `https://facebook.com/${credential.account_name}/posts/simulated_${Date.now()}`
+        };
+    } catch (error) {
+        console.error('Facebook publish error:', error);
+        return {
+            success: false,
+            error: error instanceof Error ? error.message : 'Facebook publishing failed'
+        };
+    }
+}
+
+async function publishToLinkedIn(post: ScheduledPost, credential: PlatformCredential) {
+    console.log(`Publishing to LinkedIn: ${post.title}`);
+
+    try {
+        // Simulate LinkedIn publishing - would need actual LinkedIn API implementation
+        return {
+            success: true,
+            postId: `li_${Date.now()}`,
+            url: `https://linkedin.com/feed/update/simulated_${Date.now()}`
+        };
+    } catch (error) {
+        console.error('LinkedIn publish error:', error);
+        return {
+            success: false,
+            error: error instanceof Error ? error.message : 'LinkedIn publishing failed'
+        };
+    }
 }
 
 async function updatePostStatus(

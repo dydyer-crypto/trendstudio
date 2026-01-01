@@ -14,6 +14,16 @@ import { supabase } from '@/db/supabase';
 import type { ScheduledPost, SocialPlatform, PostStatus, ContentType } from '@/types';
 import { format, startOfMonth, endOfMonth, eachDayOfInterval, isSameMonth, isSameDay, addMonths, subMonths, startOfWeek, endOfWeek, parseISO } from 'date-fns';
 import { fr } from 'date-fns/locale';
+import { aiConsultant } from '@/services/aiConsultant';
+import { Wand2, BrainCircuit, BarChart3, Clock, CheckCircle2, AlertCircle, Sparkles } from 'lucide-react';
+import { Progress } from '@/components/ui/progress';
+import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
+import { ScrollArea } from '@/components/ui/scroll-area';
+import { SocialAnalytics } from '@/components/analytics/SocialAnalytics';
+import { Lightbulb, CopyPlus, Rocket, RefreshCcw, Trophy, Zap } from 'lucide-react';
+import { addDays, startOfToday } from 'date-fns';
 
 const platformIcons: Record<SocialPlatform, any> = {
   youtube: Youtube,
@@ -70,6 +80,10 @@ export default function CalendarPage() {
     notes: '',
   });
 
+  const [isGenerating, setIsGenerating] = useState(false);
+  const [isAutoPiloting, setIsAutoPiloting] = useState(false);
+  const [socialStrategy, setSocialStrategy] = useState<any>(null);
+
   useEffect(() => {
     loadPosts();
   }, [profile, currentDate]);
@@ -96,6 +110,50 @@ export default function CalendarPage() {
       toast.error('Impossible de charger les publications');
     } finally {
       setLoading(false);
+    }
+  };
+
+  const loadLatestStrategy = async () => {
+    if (!profile) return;
+    try {
+      const { data } = await supabase
+        .from('social_media_analyses')
+        .select('*')
+        .eq('user_id', profile.id)
+        .order('created_at', { ascending: false })
+        .limit(1);
+
+      if (data && data.length > 0) {
+        setSocialStrategy(data[0].results);
+      }
+    } catch (e) {
+      console.error('Failed to load strategy');
+    }
+  };
+
+  useEffect(() => {
+    loadLatestStrategy();
+  }, [profile]);
+
+  const handleAIGenerate = async () => {
+    if (!formData.title || !formData.platform) {
+      toast.error("Donnez au moins un titre et une plateforme");
+      return;
+    }
+
+    setIsGenerating(true);
+    try {
+      const content = await aiConsultant.generateAIOContent({
+        type: `Post ${formData.platform}`,
+        topic: formData.title,
+        tone: socialStrategy?.strategy?.tone_of_voice || 'Viral & Engageant'
+      });
+      setFormData(prev => ({ ...prev, description: content }));
+      toast.success("Contenu généré par l'IA ! ✨");
+    } catch (error) {
+      toast.error("Erreur de génération AI");
+    } finally {
+      setIsGenerating(false);
     }
   };
 
@@ -141,6 +199,64 @@ export default function CalendarPage() {
       notes: post.notes || '',
     });
     setDialogOpen(true);
+  };
+
+  const handleAutoPilot = async () => {
+    if (!profile || !socialStrategy) {
+      toast.error("Veuillez d'abord générer une stratégie dans l'audit de site");
+      return;
+    }
+
+    const confirmAction = confirm("Voulez-vous que l'IA ajoute 30 jours de contenu supplémentaire basés sur votre stratégie et vos posts existants ?");
+    if (!confirmAction) return;
+
+    setIsAutoPiloting(true);
+    const toastId = toast.loading("TrendStudio Auto-Pilot en cours d'activation...");
+
+    try {
+      // 1. Get existing post titles to avoid duplicates
+      const { data: existingPosts } = await supabase
+        .from('scheduled_posts')
+        .select('title, scheduled_date')
+        .eq('user_id', profile.id);
+
+      const existingTitles = existingPosts?.map(p => p.title) || [];
+
+      // 2. Find the last scheduled date
+      let startDate = startOfToday();
+      if (existingPosts && existingPosts.length > 0) {
+        const lastPostDate = new Date(Math.max(...existingPosts.map(p => new Date(p.scheduled_date).getTime())));
+        if (lastPostDate > startDate) {
+          startDate = lastPostDate;
+        }
+      }
+
+      toast.message("Analyse de l'historique et planification de la suite...", { id: toastId });
+      const suggestedPosts = await aiConsultant.generateCalendarChunk(socialStrategy, 30, existingTitles);
+
+      toast.message(`Génération de ${suggestedPosts.length} nouvelles publications...`, { id: toastId });
+
+      const postsToInsert = suggestedPosts.map((p: any) => ({
+        user_id: profile?.id,
+        title: p.title,
+        platform: p.platform,
+        content_type: p.content_type,
+        status: 'scheduled',
+        scheduled_date: addDays(startDate, p.day_offset).toISOString(),
+        description: `IA Sugérée: ${p.title}. Utilisez la Magie IA pour rédiger le contenu.`
+      }));
+
+      const { error } = await supabase.from('scheduled_posts').insert(postsToInsert);
+      if (error) throw error;
+
+      toast.success("30 jours de contenu ajoutés au planning ! 🚀", { id: toastId });
+      loadPosts();
+    } catch (error) {
+      console.error(error);
+      toast.error("Échec de l'Auto-Pilot", { id: toastId });
+    } finally {
+      setIsAutoPiloting(false);
+    }
   };
 
   const handleSavePost = async () => {
@@ -224,43 +340,114 @@ export default function CalendarPage() {
       {/* Header */}
       <div className="flex flex-col xl:flex-row items-start xl:items-center justify-between gap-4">
         <div className="space-y-2">
-          <h1 className="text-3xl xl:text-4xl font-bold">Calendrier de publication</h1>
-          <p className="text-muted-foreground text-base xl:text-lg">
-            Planifiez et gérez vos publications sur les réseaux sociaux
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 text-primary text-xs font-bold mb-1">
+            <BrainCircuit size={14} /> Intelligence Sociale Active
+          </div>
+          <h1 className="text-3xl xl:text-4xl font-extrabold tracking-tight bg-gradient-to-r from-primary to-blue-600 bg-clip-text text-transparent">
+            Planificateur Social Pro
+          </h1>
+          <p className="text-muted-foreground text-sm xl:text-base">
+            Gérez vos campagnes et optimisez votre viralité avec l'IA.
           </p>
         </div>
-        <Button onClick={() => openCreateDialog()} className="gap-2">
-          <Plus className="w-4 h-4" />
-          Nouvelle publication
-        </Button>
+        <div className="flex gap-3">
+          <Sheet>
+            <SheetTrigger asChild>
+              <Button variant="outline" className="gap-2 border-2">
+                <BarChart3 className="w-4 h-4" /> Analyse
+              </Button>
+            </SheetTrigger>
+            <SheetContent side="right" className="w-[100vw] sm:max-w-[800px] overflow-y-auto">
+              <SheetHeader>
+                <SheetTitle className="text-2xl font-bold flex items-center gap-2">
+                  <BarChart3 className="text-primary" /> Intelligence Analytique
+                </SheetTitle>
+                <SheetDescription>
+                  Visualisez l'impact et la performance de votre stratégie sociale.
+                </SheetDescription>
+              </SheetHeader>
+              <div className="mt-8 pb-12">
+                <SocialAnalytics />
+              </div>
+            </SheetContent>
+          </Sheet>
+
+          <AIContentIdeas strategy={socialStrategy} onCreatePost={(title) => {
+            setFormData(prev => ({ ...prev, title }));
+            setDialogOpen(true);
+          }} />
+
+          <Button
+            variant="outline"
+            className="gap-2 border-2 border-primary/20 bg-primary/5 text-primary hover:bg-primary/10"
+            onClick={handleAutoPilot}
+            disabled={isAutoPiloting}
+          >
+            {isAutoPiloting ? (
+              <RefreshCcw className="w-4 h-4 animate-spin" />
+            ) : (
+              <Rocket className="w-4 h-4" />
+            )}
+            Auto-Pilot 30j
+          </Button>
+          <Button onClick={() => openCreateDialog()} className="gap-2 gradient-primary shadow-lg shadow-primary/20 h-11 px-6">
+            <Plus className="w-4 h-4" />
+            Planifier un contenu
+          </Button>
+        </div>
+      </div>
+
+      {/* Stats Summary */}
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+        <StatSmallCard icon={Clock} label="En attente" value={posts.filter(p => p.status === 'scheduled').length} color="text-blue-500" />
+        <StatSmallCard icon={CheckCircle2} label="Publiés ce mois" value={posts.filter(p => p.status === 'published').length} color="text-green-500" />
+        <StatSmallCard icon={AlertCircle} label="Brouillons" value={posts.filter(p => p.status === 'draft').length} color="text-amber-500" />
+        <Card className="bg-primary/5 border-primary/20 overflow-hidden relative group">
+          <div className="absolute top-0 right-0 p-2 opacity-10 group-hover:scale-110 transition-transform">
+            <Sparkles className="w-12 h-12" />
+          </div>
+          <CardContent className="p-4 flex flex-col justify-center h-full">
+            <p className="text-xs font-bold uppercase text-primary/70 mb-1">Potentiel Viral</p>
+            <div className="flex items-center gap-3">
+              <span className="text-2xl font-bold">85%</span>
+              <Progress value={85} className="h-1.5 flex-1" />
+            </div>
+          </CardContent>
+        </Card>
       </div>
 
       {/* Calendar Navigation */}
       <Card>
-        <CardHeader>
+        <CardHeader className="border-b bg-muted/30 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <Button variant="outline" size="icon" onClick={handlePreviousMonth}>
-                <ChevronLeft className="w-4 h-4" />
+              <Button variant="ghost" size="sm" className="h-8 px-2" onClick={handlePreviousMonth}>
+                <ChevronLeft className="w-5 h-5" />
               </Button>
-              <Button variant="outline" onClick={handleToday}>
+              <Button variant="outline" size="sm" className="h-8 font-bold" onClick={handleToday}>
                 Aujourd'hui
               </Button>
-              <Button variant="outline" size="icon" onClick={handleNextMonth}>
-                <ChevronRight className="w-4 h-4" />
+              <Button variant="ghost" size="sm" className="h-8 px-2" onClick={handleNextMonth}>
+                <ChevronRight className="w-5 h-5" />
               </Button>
             </div>
-            <CardTitle className="text-xl xl:text-2xl">
-              {format(currentDate, 'MMMM yyyy', { locale: fr })}
+            <CardTitle className="text-xl font-bold font-mono">
+              {format(currentDate, 'MMMM yyyy', { locale: fr }).toUpperCase()}
             </CardTitle>
+            <Tabs defaultValue="month" className="h-8">
+              <TabsList className="h-8">
+                <TabsTrigger value="month" className="text-xs h-6">Mois</TabsTrigger>
+                <TabsTrigger value="week" className="text-xs h-6">Semaine</TabsTrigger>
+              </TabsList>
+            </Tabs>
           </div>
         </CardHeader>
-        <CardContent>
+        <CardContent className="p-0">
           {/* Calendar Grid */}
-          <div className="grid grid-cols-7 gap-2">
+          <div className="grid grid-cols-7 gap-px bg-border">
             {/* Day headers */}
-            {['Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam', 'Dim'].map((day) => (
-              <div key={day} className="text-center font-medium text-sm text-muted-foreground p-2">
+            {['LUNDI', 'MARDI', 'MERCREDI', 'JEUDI', 'VENDREDI', 'SAMEDI', 'DIMANCHE'].map((day) => (
+              <div key={day} className="bg-muted/50 text-center font-bold text-[10px] tracking-widest text-muted-foreground p-3 border-b">
                 {day}
               </div>
             ))}
@@ -274,39 +461,36 @@ export default function CalendarPage() {
               return (
                 <div
                   key={day.toISOString()}
-                  className={`min-h-24 xl:min-h-32 p-2 border rounded-lg ${
-                    isCurrentMonth ? 'bg-card' : 'bg-muted/30'
-                  } ${isToday ? 'border-primary border-2' : 'border-border'} cursor-pointer hover:bg-accent/50 transition-colors`}
+                  className={`min-h-[120px] xl:min-h-[160px] p-2 bg-card relative group transition-all hover:bg-muted/20 ${!isCurrentMonth ? 'opacity-40 grayscale-[0.5]' : ''
+                    }`}
                   onClick={() => openCreateDialog(day)}
                 >
-                  <div className={`text-sm font-medium mb-1 ${isToday ? 'text-primary' : ''}`}>
+                  <div className={`text-sm font-bold mb-2 flex justify-between items-center ${isToday ? 'bg-primary text-primary-foreground h-7 w-7 rounded-full flex items-center justify-center' : 'text-muted-foreground'}`}>
                     {format(day, 'd')}
+                    {isToday && <span className="absolute top-1 right-2 w-1.5 h-1.5 rounded-full bg-primary animate-pulse" />}
                   </div>
-                  <div className="space-y-1">
-                    {dayPosts.slice(0, 3).map((post) => {
+
+                  <div className="space-y-1.5 overflow-hidden">
+                    {dayPosts.map((post) => {
                       const PlatformIcon = platformIcons[post.platform];
                       return (
                         <div
                           key={post.id}
-                          className="text-xs p-1 rounded bg-primary/10 hover:bg-primary/20 truncate cursor-pointer"
+                          className={`group/item text-[10px] p-1.5 rounded-md border-l-4 ${platformColors[post.platform]} bg-white dark:bg-zinc-900 shadow-sm border border-border/50 hover:shadow-md transition-all cursor-pointer truncate flex items-center gap-2`}
                           onClick={(e) => {
                             e.stopPropagation();
                             openEditDialog(post);
                           }}
                         >
-                          <div className="flex items-center gap-1">
-                            <PlatformIcon className="w-3 h-3 shrink-0" />
-                            <span className="truncate">{post.title}</span>
-                          </div>
+                          <PlatformIcon className="w-3 h-3 shrink-0" />
+                          <span className="font-semibold truncate flex-1">{post.title}</span>
+                          <div className={`w-1.5 h-1.5 rounded-full ${statusColors[post.status]}`} />
                         </div>
                       );
                     })}
-                    {dayPosts.length > 3 && (
-                      <div className="text-xs text-muted-foreground">
-                        +{dayPosts.length - 3} plus
-                      </div>
-                    )}
                   </div>
+
+                  <div className="absolute inset-0 bg-primary/5 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none border-2 border-primary/20 rounded-sm" />
                 </div>
               );
             })}
@@ -338,13 +522,29 @@ export default function CalendarPage() {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="description">Description</Label>
+              <div className="flex justify-between items-center">
+                <Label htmlFor="description">Contenu du Post (Caption)</Label>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="h-7 text-[10px] gap-1.5 text-primary hover:text-primary hover:bg-primary/10 font-bold"
+                  onClick={handleAIGenerate}
+                  disabled={isGenerating}
+                >
+                  {isGenerating ? (
+                    <><Sparkles className="w-3 h-3 animate-spin" /> Rédaction...</>
+                  ) : (
+                    <><Wand2 className="w-3 h-3" /> Magie IA</>
+                  )}
+                </Button>
+              </div>
               <Textarea
                 id="description"
                 value={formData.description}
                 onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                placeholder="Description de la publication"
-                rows={3}
+                placeholder="Rédigez votre texte ici ou utilisez la magie IA..."
+                rows={6}
+                className="resize-none"
               />
             </div>
 
@@ -462,5 +662,107 @@ export default function CalendarPage() {
         </DialogContent>
       </Dialog>
     </div>
+  );
+}
+
+function AIContentIdeas({ strategy, onCreatePost }: { strategy: any, onCreatePost: (title: string) => void }) {
+  if (!strategy) return null;
+
+  return (
+    <Sheet>
+      <SheetTrigger asChild>
+        <Button variant="outline" className="gap-2 border-2 border-amber-200 bg-amber-50 text-amber-700 hover:bg-amber-100 hover:text-amber-800">
+          <Lightbulb className="w-4 h-4" /> Idées IA
+        </Button>
+      </SheetTrigger>
+      <SheetContent className="w-[400px] sm:w-[540px]">
+        <SheetHeader>
+          <SheetTitle className="flex items-center gap-2">
+            <BrainCircuit className="text-primary" /> Bibliothèque d'Idées Stratégiques
+          </SheetTitle>
+          <SheetDescription>
+            Utilisez vos piliers de contenu et hooks viraux pour créer des posts.
+          </SheetDescription>
+        </SheetHeader>
+
+        <ScrollArea className="h-[calc(100vh-120px)] pr-4 mt-6">
+          <div className="space-y-8">
+            {/* Content Pillars */}
+            <div className="space-y-4">
+              <h3 className="text-sm font-bold uppercase tracking-wider text-muted-foreground flex items-center gap-2">
+                <Trophy className="w-4 h-4 text-amber-500" /> Piliers de Contenu
+              </h3>
+              <div className="grid gap-3">
+                {strategy.strategy?.content_pillars?.map((pillar: any, i: number) => (
+                  <Card key={i} className="hover:border-primary/50 transition-colors group cursor-pointer" onClick={() => onCreatePost(pillar.title)}>
+                    <CardContent className="p-4">
+                      <div className="flex justify-between items-start mb-1">
+                        <h4 className="font-bold text-sm group-hover:text-primary">{pillar.title}</h4>
+                        <CopyPlus className="w-4 h-4 text-muted-foreground opacity-0 group-hover:opacity-100" />
+                      </div>
+                      <p className="text-xs text-muted-foreground leading-relaxed">{pillar.description}</p>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+            </div>
+
+            {/* Viral Hooks */}
+            <div className="space-y-4">
+              <h3 className="text-sm font-bold uppercase tracking-wider text-muted-foreground flex items-center gap-2">
+                <Zap className="w-4 h-4 text-yellow-500" /> Hooks Viraux (Accroches)
+              </h3>
+              <div className="grid gap-2">
+                {strategy.hooks?.map((hook: string, i: number) => (
+                  <div
+                    key={i}
+                    className="p-3 rounded-lg border bg-muted/30 text-xs font-medium hover:bg-primary/5 hover:border-primary/30 transition-all cursor-pointer flex justify-between items-center group"
+                    onClick={() => onCreatePost(hook)}
+                  >
+                    <span className="flex-1 italic">"{hook}"</span>
+                    <Plus className="w-4 h-4 text-primary opacity-0 group-hover:opacity-100" />
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Suggested Topics */}
+            <div className="space-y-4">
+              <h3 className="text-sm font-bold uppercase tracking-wider text-muted-foreground flex items-center gap-2">
+                <Sparkles className="w-4 h-4 text-purple-500" /> Sujets suggérés
+              </h3>
+              <div className="flex flex-wrap gap-2">
+                {strategy.strategy?.suggested_topics?.map((topic: string, i: number) => (
+                  <Badge
+                    key={i}
+                    variant="secondary"
+                    className="py-1.5 px-3 cursor-pointer hover:bg-primary hover:text-white transition-colors"
+                    onClick={() => onCreatePost(topic)}
+                  >
+                    {topic}
+                  </Badge>
+                ))}
+              </div>
+            </div>
+          </div>
+        </ScrollArea>
+      </SheetContent>
+    </Sheet>
+  );
+}
+
+function StatSmallCard({ icon: Icon, label, value, color }: any) {
+  return (
+    <Card className="shadow-sm border-none bg-muted/20">
+      <CardContent className="p-4 flex items-center gap-4">
+        <div className={`p-2 rounded-lg bg-white dark:bg-zinc-900 shadow-sm ${color}`}>
+          <Icon size={20} />
+        </div>
+        <div>
+          <p className="text-[10px] font-bold uppercase text-muted-foreground tracking-wider">{label}</p>
+          <p className="text-xl font-bold">{value}</p>
+        </div>
+      </CardContent>
+    </Card>
   );
 }

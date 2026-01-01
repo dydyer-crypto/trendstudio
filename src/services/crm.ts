@@ -39,8 +39,20 @@ export class CRMService {
                 },
                 body: JSON.stringify({
                     source: 'TrendStudio AI Consultant',
+                    event: 'quote.accepted',
                     timestamp: new Date().toISOString(),
-                    data: quoteData
+                    payload: {
+                        site_url: quoteData.url,
+                        audit_score: quoteData.score,
+                        summary: quoteData.summary,
+                        total_budget: quoteData.budget_estimate?.total,
+                        proposed_variants: quoteData.redesign_variants?.map((v: any) => ({
+                            title: v.title,
+                            type: v.type,
+                            focus: v.focus
+                        })),
+                        full_report: quoteData
+                    }
                 }),
             });
 
