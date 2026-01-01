@@ -183,6 +183,16 @@
   - [x] Test language switcher functionality
   - [x] Create LANGUAGE_TEST.md verification guide
 
+- [x] Step 17: Brand Cleanup - TrendStudio Exclusively
+  - [x] Search for all VIRALIX mentions in codebase
+  - [x] Search for all ALTIO mentions in codebase
+  - [x] Replace VIRALIX with TrendStudio in docs/prd.md
+  - [x] Update image download filename in ImageGeneratorPage.tsx
+  - [x] Update Supabase bucket name in imageUpload.ts
+  - [x] Verify no VIRALIX or ALTIO mentions remain in active code
+  - [x] Run lint tests to ensure no errors
+  - [x] Create BRAND_CLEANUP.md documentation
+
 ## Notes
 - First registered user becomes admin automatically
 - Stripe secret key must be configured by user after deployment

@@ -151,7 +151,7 @@ const ImageGeneratorPage: React.FC = () => {
     if (generatedImage) {
       const link = document.createElement('a');
       link.href = generatedImage;
-      link.download = `viralix-image-${Date.now()}.png`;
+      link.download = `trendstudio-image-${Date.now()}.png`;
       link.click();
     }
   };
