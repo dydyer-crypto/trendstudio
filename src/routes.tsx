@@ -8,6 +8,7 @@ import AIOPage from './pages/AIOPage';
 import SiteRedesignPage from './pages/SiteRedesignPage';
 import QuotesPage from './pages/QuotesPage';
 import AgencyPage from './pages/AgencyPage';
+import SocialCallbackPage from './pages/SocialCallbackPage';
 import APISettingsPage from './pages/APISettingsPage';
 import ForgotPasswordPage from './pages/ForgotPasswordPage';
 import ResetPasswordPage from './pages/ResetPasswordPage';
@@ -88,6 +89,11 @@ const routes: RouteConfig[] = [
     name: 'Integrations',
     path: '/settings/api',
     element: <APISettingsPage />
+  },
+  {
+    path: '/api/auth/:platform/callback',
+    element: <SocialCallbackPage />,
+    visible: false
   },
   {
     name: 'Video Generator',

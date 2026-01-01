@@ -1,6 +1,7 @@
 
 import { APIKeyManager } from "@/components/settings/APIKeyManager";
 import { WebhookConfig } from "@/components/settings/WebhookConfig";
+import { SocialMediaConnections } from "@/components/settings/SocialMediaConnections";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { useState, useEffect } from "react";
@@ -55,6 +56,18 @@ export default function APISettingsPage() {
                 </CardHeader>
                 <CardContent>
                     <WebhookConfig webhooks={webhooks} />
+                </CardContent>
+            </Card>
+
+            <Card>
+                <CardHeader>
+                    <CardTitle>Comptes Réseaux Sociaux</CardTitle>
+                    <CardDescription>
+                        Connectez vos comptes YouTube, Instagram, TikTok, etc. pour la publication automatique.
+                    </CardDescription>
+                </CardHeader>
+                <CardContent>
+                    <SocialMediaConnections />
                 </CardContent>
             </Card>
         </div>
