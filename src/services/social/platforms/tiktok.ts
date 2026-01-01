@@ -151,4 +151,34 @@ export class TikTokAPIClient {
             return null;
         }
     }
+
+    /**
+     * Get user statistics
+     */
+    async getUserStats(): Promise<{ followerCount: number; heartCount: number; videoCount: number }> {
+        try {
+            // For TikTok, we use the user info endpoint which includes stats
+            const response = await fetch('https://open-api.tiktok.com/user/info/', {
+                headers: {
+                    'Authorization': `Bearer ${this.credential.access_token}`,
+                },
+            });
+
+            if (!response.ok) {
+                throw new Error(`TikTok API error: ${response.statusText}`);
+            }
+
+            const data = await response.json();
+            const user = data.data?.user || {};
+
+            return {
+                followerCount: user.follower_count || 0,
+                heartCount: user.heart_count || 0,
+                videoCount: user.video_count || 0,
+            };
+        } catch (error) {
+            console.error('Failed to get TikTok stats:', error);
+            return { followerCount: 0, heartCount: 0, videoCount: 0 };
+        }
+    }
 }

@@ -180,6 +180,39 @@ export class LinkedInAPIClient {
     }
 
     /**
+     * Get profile statistics (followers)
+     */
+    async getProfileStats(): Promise<{ followerCount: number }> {
+        try {
+            const userInfo = await this.getUserInfo();
+            const personUrn = `urn:li:person:${userInfo.id}`;
+
+            // Get follower count for the profile
+            const response = await fetch(
+                `https://api.linkedin.com/v2/networkSizes/${personUrn}?edgeType=COMPANY_FOLLOWED_BY_MEMBER`,
+                {
+                    headers: {
+                        'Authorization': `Bearer ${this.credential.access_token}`,
+                    },
+                }
+            );
+
+            if (!response.ok) {
+                // If the above fails, try a simpler stats fetch or return 0
+                return { followerCount: 0 };
+            }
+
+            const data = await response.json();
+            return {
+                followerCount: data.firstDegreeSize || 0
+            };
+        } catch (error) {
+            console.error('Failed to get LinkedIn stats:', error);
+            return { followerCount: 0 };
+        }
+    }
+
+    /**
      * Get user info
      */
     async getUserInfo(): Promise<any> {

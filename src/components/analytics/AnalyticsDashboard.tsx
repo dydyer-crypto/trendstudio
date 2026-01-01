@@ -24,7 +24,8 @@ import {
     Youtube,
     Instagram,
     Music,
-    Twitter
+    Twitter,
+    Linkedin
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
@@ -211,46 +212,63 @@ export function AnalyticsDashboard() {
                     </CardHeader>
                     <CardContent>
                         <div className="space-y-4">
-                            <div className="flex items-center gap-4">
-                                <Youtube className="h-4 w-4 text-red-500" />
-                                <div className="flex-1 space-y-1">
-                                    <p className="text-sm font-medium leading-none">YouTube</p>
-                                    <div className="h-2 w-full bg-secondary rounded-full overflow-hidden">
-                                        <div className="h-full bg-red-500" style={{ width: '45%' }} />
+                            {Object.entries(
+                                data.reduce((acc, curr) => {
+                                    if (!acc[curr.platform]) acc[curr.platform] = 0;
+                                    acc[curr.platform] = Math.max(acc[curr.platform], curr.follower_count || 0);
+                                    return acc;
+                                }, {} as Record<string, number>)
+                            ).map(([platform, followers]) => {
+                                const total = Object.values(data.reduce((acc, curr) => {
+                                    if (!acc[curr.platform]) acc[curr.platform] = 0;
+                                    acc[curr.platform] = Math.max(acc[curr.platform], curr.follower_count || 0);
+                                    return acc;
+                                }, {} as Record<string, number>)).reduce((a, b) => a + b, 0);
+
+                                const percentage = total > 0 ? Math.round((followers / total) * 100) : 0;
+
+                                const PlatformIcon = {
+                                    youtube: Youtube,
+                                    instagram: Instagram,
+                                    tiktok: Music,
+                                    twitter: Twitter,
+                                    linkedin: Linkedin
+                                }[platform as string] || TrendingUp;
+
+                                const color = {
+                                    youtube: 'text-red-500',
+                                    instagram: 'text-pink-500',
+                                    tiktok: 'text-black',
+                                    twitter: 'text-blue-400',
+                                    linkedin: 'text-blue-700'
+                                }[platform as string] || 'text-primary';
+
+                                const bgColor = {
+                                    youtube: 'bg-red-500',
+                                    instagram: 'bg-pink-500',
+                                    tiktok: 'bg-black',
+                                    twitter: 'bg-blue-400',
+                                    linkedin: 'bg-blue-700'
+                                }[platform as string] || 'bg-primary';
+
+                                return (
+                                    <div key={platform} className="flex items-center gap-4">
+                                        <PlatformIcon className={`h-4 w-4 ${color}`} />
+                                        <div className="flex-1 space-y-1">
+                                            <p className="text-sm font-medium leading-none capitalize">{platform}</p>
+                                            <div className="h-2 w-full bg-secondary rounded-full overflow-hidden">
+                                                <div className="h-full transition-all" style={{ width: `${percentage}%`, backgroundColor: bgColor.replace('bg-', '') }} />
+                                            </div>
+                                        </div>
+                                        <div className="text-sm font-medium">{percentage}%</div>
                                     </div>
-                                </div>
-                                <div className="text-sm font-medium">45%</div>
-                            </div>
-                            <div className="flex items-center gap-4">
-                                <Instagram className="h-4 w-4 text-pink-500" />
-                                <div className="flex-1 space-y-1">
-                                    <p className="text-sm font-medium leading-none">Instagram</p>
-                                    <div className="h-2 w-full bg-secondary rounded-full overflow-hidden">
-                                        <div className="h-full bg-pink-500" style={{ width: '30%' }} />
-                                    </div>
-                                </div>
-                                <div className="text-sm font-medium">30%</div>
-                            </div>
-                            <div className="flex items-center gap-4">
-                                <Music className="h-4 w-4" />
-                                <div className="flex-1 space-y-1">
-                                    <p className="text-sm font-medium leading-none">TikTok</p>
-                                    <div className="h-2 w-full bg-secondary rounded-full overflow-hidden">
-                                        <div className="h-full bg-black" style={{ width: '15%' }} />
-                                    </div>
-                                </div>
-                                <div className="text-sm font-medium">15%</div>
-                            </div>
-                            <div className="flex items-center gap-4">
-                                <Twitter className="h-4 w-4 text-blue-400" />
-                                <div className="flex-1 space-y-1">
-                                    <p className="text-sm font-medium leading-none">Twitter</p>
-                                    <div className="h-2 w-full bg-secondary rounded-full overflow-hidden">
-                                        <div className="h-full bg-blue-400" style={{ width: '10%' }} />
-                                    </div>
-                                </div>
-                                <div className="text-sm font-medium">10%</div>
-                            </div>
+                                );
+                            })}
+                            {data.length === 0 && (
+                                <p className="text-center text-muted-foreground text-sm py-8">
+                                    Aucune donnée par plateforme disponible.
+                                </p>
+                            )}
                         </div>
                     </CardContent>
                 </Card>

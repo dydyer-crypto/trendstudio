@@ -67,4 +67,32 @@ export class InstagramAPIClient {
             return null;
         }
     }
+
+    /**
+     * Get user statistics
+     */
+    async getUserStats(): Promise<{ followerCount: number; mediaCount: number }> {
+        try {
+            const response = await fetch(
+                `https://graph.instagram.com/me?fields=id,username,media_count&access_token=${this.credential.access_token}`
+            );
+
+            if (!response.ok) {
+                throw new Error(`Instagram API error: ${response.statusText}`);
+            }
+
+            const data = await response.json();
+
+            // Basic Display API doesn't provide follower count directly.
+            // For a production app, we would use the Graph API or a third-party scraper/service.
+            // Here we return media_count and a dummy follower count for UI demo.
+            return {
+                followerCount: 0, // Would need Graph API
+                mediaCount: data.media_count || 0
+            };
+        } catch (error) {
+            console.error('Failed to get Instagram stats:', error);
+            return { followerCount: 0, mediaCount: 0 };
+        }
+    }
 }

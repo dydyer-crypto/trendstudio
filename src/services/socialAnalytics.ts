@@ -1,6 +1,9 @@
 import { supabase } from '@/db/supabase';
 import { socialAuth, type SocialPlatform, type PlatformCredential } from './socialAuth';
 import { YouTubeAPIClient } from './social/platforms/youtube';
+import { InstagramAPIClient } from './social/platforms/instagram';
+import { TikTokAPIClient } from './social/platforms/tiktok';
+import { LinkedInAPIClient } from './social/platforms/linkedin';
 
 export interface PlatformStats {
     platform: SocialPlatform;
@@ -61,7 +64,18 @@ export class SocialAnalyticsService {
                 const ytClient = new YouTubeAPIClient(credential);
                 return await ytClient.getChannelStats();
 
-            // Other platforms to be added as APIs are fully integrated
+            case 'instagram':
+                const igClient = new InstagramAPIClient(credential);
+                return await igClient.getUserStats();
+
+            case 'tiktok':
+                const ttClient = new TikTokAPIClient(credential);
+                return await ttClient.getUserStats();
+
+            case 'linkedin':
+                const liClient = new LinkedInAPIClient(credential);
+                return await liClient.getProfileStats();
+
             default:
                 console.warn(`Stats fetching not implemented for ${credential.platform}`);
                 return null;
