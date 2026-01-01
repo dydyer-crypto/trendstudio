@@ -1,5 +1,5 @@
 // API service for TrendStudio AI integrations
-const APP_ID = import.meta.env.VITE_APP_ID || 'app-8l72dx9ovd34';
+const APP_ID = import.meta.env.VITE_APP_ID || 'app-8mth6gdsxz40';
 
 // Common headers for all API requests
 const getHeaders = (contentType = 'application/json') => ({
@@ -43,7 +43,7 @@ export interface ChatResponse {
  * Returns EventSource for streaming responses
  */
 export const sendChatMessage = (messages: ChatMessage[]): EventSource => {
-  const url = 'https://api-integrations.appmedo.com/app-8l72dx9ovd34/api-rLob8RdzAOl9/v1beta/models/gemini-2.5-flash:streamGenerateContent?alt=sse';
+  const url = 'https://api-integrations.appmedo.com/app-8mth6gdsxz40/api-rLob8RdzAOl9/v1beta/models/gemini-2.5-flash:streamGenerateContent?alt=sse';
   
   const eventSource = new EventSource(url);
   
@@ -63,7 +63,7 @@ export const sendChatMessage = (messages: ChatMessage[]): EventSource => {
  * Send chat message to Large Language Model (non-streaming)
  */
 export const sendChatMessageSync = async (messages: ChatMessage[]): Promise<ChatResponse> => {
-  const url = 'https://api-integrations.appmedo.com/app-8l72dx9ovd34/api-rLob8RdzAOl9/v1beta/models/gemini-2.5-flash:streamGenerateContent';
+  const url = 'https://api-integrations.appmedo.com/app-8mth6gdsxz40/api-rLob8RdzAOl9/v1beta/models/gemini-2.5-flash:streamGenerateContent';
   
   const response = await fetch(url, {
     method: 'POST',
@@ -124,7 +124,7 @@ export interface VideoTaskResponse {
  * Create a text-to-video generation task
  */
 export const createTextToVideo = async (request: TextToVideoRequest): Promise<VideoTaskResponse> => {
-  const url = 'https://api-integrations.appmedo.com/app-8l72dx9ovd34/api-DY8MX5oBQDGa/v1/videos/text2video';
+  const url = 'https://api-integrations.appmedo.com/app-8mth6gdsxz40/api-DY8MX5oBQDGa/v1/videos/text2video';
   
   const response = await fetch(url, {
     method: 'POST',
@@ -180,7 +180,7 @@ export interface ImageToVideoRequest {
  * Create an image-to-video generation task
  */
 export const createImageToVideo = async (request: ImageToVideoRequest): Promise<VideoTaskResponse> => {
-  const url = 'https://api-integrations.appmedo.com/app-8l72dx9ovd34/api-6LeB8Qe4rWGY/v1/videos/image2video';
+  const url = 'https://api-integrations.appmedo.com/app-8mth6gdsxz40/api-6LeB8Qe4rWGY/v1/videos/image2video';
   
   const response = await fetch(url, {
     method: 'POST',
@@ -257,7 +257,7 @@ export interface ImageGenerationResponse {
  * Timeout should be set to 300s
  */
 export const generateImage = async (request: ImageGenerationRequest): Promise<ImageGenerationResponse> => {
-  const url = 'https://api-integrations.appmedo.com/app-8l72dx9ovd34/api-Xa6JZ58oPMEa/v1beta/models/gemini-3-pro-image-preview:generateContent';
+  const url = 'https://api-integrations.appmedo.com/app-8mth6gdsxz40/api-Xa6JZ58oPMEa/v1beta/models/gemini-3-pro-image-preview:generateContent';
   
   const controller = new AbortController();
   const timeoutId = setTimeout(() => controller.abort(), 300000); // 300s timeout

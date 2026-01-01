@@ -1,6 +1,6 @@
 import { supabase } from '@/db/supabase';
 
-const BUCKET_NAME = 'app-8l72dx9ovd34_trendstudio_images';
+const BUCKET_NAME = 'app-8mth6gdsxz40_trendstudio_images';
 const MAX_FILE_SIZE = 1048576; // 1MB
 const MAX_RESOLUTION = 1080;
 const COMPRESSION_QUALITY = 0.8;
