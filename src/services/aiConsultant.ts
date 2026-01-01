@@ -206,6 +206,49 @@ export class AIConsultantService {
             throw new Error('Échec de l\'analyse Social Media par l\'IA Consultant');
         }
     }
+
+    async generateAIOContent(options: {
+        type: string;
+        topic: string;
+        keywords?: string;
+        tone?: string;
+        language?: string;
+    }): Promise<string> {
+        const prompt = `
+            Tu es un Rédacteur Web Expert & Spécialiste SEO AIO chez TrendStudio.
+            Ta mission est de rédiger un contenu de haute qualité, optimisé pour les moteurs de recherche et engageant pour les lecteurs.
+            
+            TYPE DE CONTENU : ${options.type}
+            SUJET : ${options.topic}
+            MOTS-CLÉS À INTÉGRER : ${options.keywords || 'Sélectionne les plus pertinents pour le sujet'}
+            TON : ${options.tone || 'Équilibré (Professionnel mais accessible)'}
+            LANGUE : ${options.language || 'Français'}
+            
+            DIRECTIVES RÉDACTIONNELLES :
+            1. Structure le texte avec des titres (H1, H2, H3) clairs et captivants.
+            2. Utilise des paragraphes courts pour une meilleure lisibilité.
+            3. Intégre naturellement les mots-clés sans "keyword stuffing".
+            4. Ajoute une introduction accrocheuse et une conclusion avec un "Call to Action" (CTA).
+            5. Si c'est un article, ajoute une section "FAQ" à la fin.
+            6. Si c'est une description produit, mets en avant les bénéfices avant les caractéristiques.
+            
+            Formatte le résultat en Markdown propre.
+        `;
+
+        try {
+            const response = await sendChatMessageSync([
+                {
+                    role: 'user',
+                    parts: [{ text: prompt }]
+                }
+            ]);
+
+            return response.candidates[0].content.parts[0].text;
+        } catch (error) {
+            console.error('AI AIO Generation failed:', error);
+            throw new Error('Échec de la génération de contenu AIO');
+        }
+    }
 }
 
 export const aiConsultant = AIConsultantService.getInstance();
