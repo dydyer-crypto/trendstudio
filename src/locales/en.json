@@ -23,7 +23,8 @@
     "filter": "Filter",
     "all": "All",
     "yes": "Yes",
-    "no": "No"
+    "no": "No",
+    "credits": "credits"
   },
   "nav": {
     "home": "Home",

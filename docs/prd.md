@@ -86,49 +86,51 @@ Both beginners and professional content creators who need to produce viral conte
 - Filter trends by platform, region, and content type
 - Provide insights on optimal posting times based on trend data
 
-### 2.11 Statistiques de Performance des Contenus
-- Tableau de bord analytique affichant les métriques de performance pour chaque contenu publié
-- Suivi des indicateurs clés : vues, likes, partages, commentaires, taux d'engagement
-- Graphiques d'évolution des performances dans le temps
-- Comparaison des performances entre différents contenus
-- Analyse par plateforme (YouTube, TikTok, Instagram, Facebook)
-- Identification des contenus les plus performants
-- Rapports exportables en PDF ou CSV
-- Suggestions d'amélioration basées sur les données de performance
+### 2.11 Content Performance Statistics
+- Analytics dashboard displaying performance metrics for each published content
+- Track key indicators: views, likes, shares, comments, engagement rate
+- Performance evolution graphs over time
+- Performance comparison between different contents
+- Analysis by platform (YouTube, TikTok, Instagram, Facebook)
+- Identification of top-performing content
+- Exportable reports in PDF or CSV format
+- Improvement suggestions based on performance data
+\n### 2.12 Interactive Tutorial System
+\n#### 2.12.1 Main Objective
+- Reduce the learning curve for new users
+- Increase activation rate by offering an intuitive and rewarding onboarding experience
+- Guide novice users without requiring external support
 
-### 2.12 Système de Tutoriels Interactifs
-\n#### 2.12.1 Objectif Principal
-- Réduire la courbe d'apprentissage des nouveaux utilisateurs
-- Augmenter le taux d'activation en offrant une prise en main intuitive et valorisante
-- Guider les utilisateurs novices sans nécessiter de support externe
+#### 2.12.2 Tutorial Structure
+- Short and independent modules, each focused on a specific task
+- Each module follows three steps:
+  1. Brief Contextualization: Explain the usefulness of the feature
+  2. Guided Interaction: User performs the action with visual indicators (highlights, arrows, numbers)
+  3. Confirmation and Follow-up: Validation of success and logical next step suggestion
 
-#### 2.12.2 Structure des Tutoriels
-- Modules courts et indépendants, chacun centré sur une tâche spécifique
-- Chaque module suit trois étapes :
-  1. Contextualisation Brève : Expliquer l'utilité de la fonctionnalité
-  2. Interaction Guidée : L'utilisateur effectue l'action avec indications visuelles (surlignages, flèches, numéros)
-  3. Confirmation et Suivi : Validation de la réussite et proposition d'enchaînement logique
+#### 2.12.3 Critical Tutorials (First 3-5 modules)
+- Tutorial 1: Create your first AI video\n- Tutorial 2: Generate your first AI image
+- Tutorial 3: Use the AI Chat assistant to write a script
+- Tutorial 4: Transform a script into a complete video
+- Tutorial 5: Publish and schedule your content
 
-#### 2.12.3 Tutoriels Critiques (3-5 premiers modules)
-- Tutoriel 1 : Créer votre première vidéo AI
-- Tutoriel 2 : Générer votre première image AI
-- Tutoriel 3 : Utiliser l'assistant AI Chat pour écrire un script
-- Tutoriel 4 : Transformer un script en vidéo complète
-- Tutoriel 5 : Publier et planifier votre contenu
+#### 2.12.4 Interactive Elements
+- Highly visible highlights and clickable areas to guide actions
+- Micro-rewards: badges, congratulatory messages, progress bars
+- Proactive contextual tips
+- Customizable path: ability to skip a tutorial and return to it later
+- Complete list of available guides accessible at any time
 
-#### 2.12.4 Éléments Interactifs\n- Surbrillances et zones cliquables très visibles pour guider les actions
-- Microrécompenses : badges, messages de félicitations, barres de progression
-- Conseils proactifs contextuels
-- Chemin personnalisable : possibilité de sauter un tutoriel et y revenir plus tard\n- Liste complète des guides disponibles accessible à tout moment
-\n#### 2.12.5 Contenu et Ton\n- Langage simple, clair et bienveillant\n- Ton encourageant et positif
-- Instructions concises placées à proximité immédiate des éléments d'interface\n- Éviter le jargon technique
-
-#### 2.12.6 Spécifications Techniques
-- Intégration non intrusive dans l'interface existante
-- Système de gestion pour désactiver les tutoriels après complétion
-- Option de réactivation dans les paramètres
-- Adaptation parfaite aux appareils mobiles avec support des gestes tactiles
-- Sauvegarde de la progression de l'utilisateur
+#### 2.12.5 Content and Tone
+- Simple, clear, and supportive language
+- Encouraging and positive tone
+- Concise instructions placed in immediate proximity to interface elements
+- Avoid technical jargon
+\n#### 2.12.6 Technical Specifications
+- Non-intrusive integration into existing interface\n- Management system to disable tutorials after completion
+- Reactivation option in settings
+- Perfect adaptation to mobile devices with touch gesture support
+- User progress saving
 
 ## 3. General Requirements
 
@@ -136,25 +138,28 @@ Both beginners and professional content creators who need to produce viral conte
 - Simple, fast, and creator-friendly UI
 - Modern design with dark/light mode support\n
 ### 3.2 Language Support
-- English and French language support
+- Bilingual interface with English and French language options
+- Clear language selection mechanism allowing users to choose their preferred language
+- Language switcher prominently displayed and easily accessible
+- Complete translation of all interface elements, labels, buttons, and content in both languages
+- Each language version maintains distinct and accurate translations without mixing languages on the same page
+- User language preference saved and applied consistently across all sessions
 
 ### 3.3 Access Type
 - Public app (open for everyone)
-
-### 3.4 User Experience
+\n### 3.4 User Experience
 - Designed for both beginners and professional creators
-- Focus on ease of use and efficiency
-
+- Focus on ease of use and efficiency\n
 ## 4. Design Style
-\n### 4.1 Color Scheme
-- Primary colors: Deep purple (#6C5CE7) and electric blue (#0984E3) for a modern, creative tech feel
-- Dark mode: Dark gray background (#1E1E2E) with vibrant accent colors\n- Light mode: Clean white background (#FFFFFF) with soft gray elements (#F5F6FA)
 
-### 4.2 Visual Details
+### 4.1 Color Scheme
+- Primary colors: Deep purple (#6C5CE7) and electric blue (#0984E3) for a modern, creative tech feel
+- Dark mode: Dark gray background (#1E1E2E) with vibrant accent colors
+- Light mode: Clean white background (#FFFFFF) with soft gray elements (#F5F6FA)
+\n### 4.2 Visual Details
 - Rounded corners (8-12px) for cards and buttons to create a friendly, modern look
 - Subtle shadows and depth layers for visual hierarchy
-- Gradient accents on primary action buttons
-- Smooth transitions and micro-animations for interactions
+- Gradient accents on primary action buttons\n- Smooth transitions and micro-animations for interactions
 - Icon style: Line-based with consistent stroke width
 
 ### 4.3 Layout

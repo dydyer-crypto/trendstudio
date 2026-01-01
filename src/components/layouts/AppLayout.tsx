@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { 
   Video, 
   Image as ImageIcon, 
@@ -41,29 +42,30 @@ interface AppLayoutProps {
 }
 
 interface NavItem {
-  name: string;
+  nameKey: string;
   path: string;
   icon: React.ReactNode;
 }
 
-const navItems: NavItem[] = [
-  { name: 'Générateur Vidéo IA', path: '/video-generator', icon: <Video className="w-5 h-5" /> },
-  { name: 'Générateur Image IA', path: '/image-generator', icon: <ImageIcon className="w-5 h-5" /> },
-  { name: 'Assistant Chat IA', path: '/chat-assistant', icon: <MessageSquare className="w-5 h-5" /> },
-  { name: 'Script vers Vidéo', path: '/script-to-video', icon: <FileText className="w-5 h-5" /> },
-  { name: 'Éditeur Vidéo', path: '/video-editor', icon: <Scissors className="w-5 h-5" /> },
-  { name: 'Calendrier', path: '/calendar', icon: <Calendar className="w-5 h-5" /> },
-  { name: 'Tendances', path: '/trends', icon: <TrendingUp className="w-5 h-5" /> },
-  { name: 'Analytics', path: '/analytics', icon: <BarChart3 className="w-5 h-5" /> },
-  { name: 'Tutoriels', path: '/tutorials', icon: <GraduationCap className="w-5 h-5" /> },
-  { name: 'Affiliation', path: '/affiliate', icon: <Users className="w-5 h-5" /> },
-  { name: 'Tarifs', path: '/pricing', icon: <CreditCard className="w-5 h-5" /> },
+const getNavItems = (t: any): NavItem[] => [
+  { nameKey: 'nav.videoGenerator', path: '/video-generator', icon: <Video className="w-5 h-5" /> },
+  { nameKey: 'nav.imageGenerator', path: '/image-generator', icon: <ImageIcon className="w-5 h-5" /> },
+  { nameKey: 'nav.chatAssistant', path: '/chat-assistant', icon: <MessageSquare className="w-5 h-5" /> },
+  { nameKey: 'nav.scriptToVideo', path: '/script-to-video', icon: <FileText className="w-5 h-5" /> },
+  { nameKey: 'nav.videoEditor', path: '/video-editor', icon: <Scissors className="w-5 h-5" /> },
+  { nameKey: 'nav.calendar', path: '/calendar', icon: <Calendar className="w-5 h-5" /> },
+  { nameKey: 'nav.trends', path: '/trends', icon: <TrendingUp className="w-5 h-5" /> },
+  { nameKey: 'nav.analytics', path: '/analytics', icon: <BarChart3 className="w-5 h-5" /> },
+  { nameKey: 'nav.tutorials', path: '/tutorials', icon: <GraduationCap className="w-5 h-5" /> },
+  { nameKey: 'nav.affiliate', path: '/affiliate', icon: <Users className="w-5 h-5" /> },
+  { nameKey: 'nav.pricing', path: '/pricing', icon: <CreditCard className="w-5 h-5" /> },
 ];
 
 export const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
   const location = useLocation();
   const navigate = useNavigate();
   const { user, profile, signOut } = useAuth();
+  const { t } = useTranslation();
   const [darkMode, setDarkMode] = useState(() => {
     if (typeof window !== 'undefined') {
       return document.documentElement.classList.contains('dark');
@@ -86,6 +88,8 @@ export const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
     navigate('/');
   };
 
+  const navItems = getNavItems(t);
+
   const NavContent = () => (
     <nav className="space-y-2">
       {navItems.map((item) => {
@@ -102,7 +106,7 @@ export const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
             )}
           >
             {item.icon}
-            <span className="font-medium">{item.name}</span>
+            <span className="font-medium">{t(item.nameKey)}</span>
           </Link>
         );
       })}
@@ -119,7 +123,7 @@ export const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
           className="w-full justify-start gap-2"
         >
           <LogIn className="w-4 h-4" />
-          <span>Sign In</span>
+          <span>{t('auth.signIn')}</span>
         </Button>
       );
     }
@@ -130,29 +134,29 @@ export const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
           <Button variant="outline" className="w-full justify-start gap-2">
             <User className="w-4 h-4" />
             <div className="flex-1 text-left">
-              <div className="text-sm font-medium">{profile?.username || 'User'}</div>
+              <div className="text-sm font-medium">{profile?.username || t('nav.profile')}</div>
               <div className="text-xs text-muted-foreground flex items-center gap-1">
                 <Sparkles className="w-3 h-3" />
-                {profile?.credits || 0} credits
+                {profile?.credits || 0} {t('common.credits')}
               </div>
             </div>
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end" className="w-56">
-          <DropdownMenuLabel>My Account</DropdownMenuLabel>
+          <DropdownMenuLabel>{t('nav.profile')}</DropdownMenuLabel>
           <DropdownMenuSeparator />
           <DropdownMenuItem onClick={() => navigate('/pricing')}>
             <CreditCard className="w-4 h-4 mr-2" />
-            Buy Credits
+            {t('nav.pricing')}
           </DropdownMenuItem>
           <DropdownMenuItem onClick={() => navigate('/orders')}>
             <ShoppingBag className="w-4 h-4 mr-2" />
-            Order History
+            {t('nav.orderHistory')}
           </DropdownMenuItem>
           <DropdownMenuSeparator />
           <DropdownMenuItem onClick={handleSignOut}>
             <LogOut className="w-4 h-4 mr-2" />
-            Sign Out
+            {t('auth.signOut')}
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
@@ -171,8 +175,8 @@ export const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
                 <Sparkles className="w-7 h-7 text-white" />
               </div>
               <div className="flex flex-col">
-                <span className="text-2xl font-bold gradient-text">TrendStudio</span>
-                <span className="text-xs text-muted-foreground">Studio de création IA</span>
+                <span className="text-2xl font-bold gradient-text">{t('common.appName')}</span>
+                <span className="text-xs text-muted-foreground">{t('common.tagline')}</span>
               </div>
             </Link>
           </div>
@@ -182,7 +186,7 @@ export const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
             <NavContent />
           </div>
 
-          {/* User Menu & Dark Mode Toggle */}
+          {/* Menu utilisateur & Basculer mode sombre */}
           <div className="p-4 border-t border-border space-y-2">
             <UserMenu />
             <div className="flex gap-2">
@@ -195,12 +199,12 @@ export const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
                 {darkMode ? (
                   <>
                     <Sun className="w-4 h-4" />
-                    <span>Light Mode</span>
+                    <span>{t('settings.light')}</span>
                   </>
                 ) : (
                   <>
                     <Moon className="w-4 h-4" />
-                    <span>Dark Mode</span>
+                    <span>{t('settings.dark')}</span>
                   </>
                 )}
               </Button>
@@ -220,8 +224,8 @@ export const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
                 <Sparkles className="w-6 h-6 text-white" />
               </div>
               <div className="flex flex-col">
-                <span className="text-xl font-bold gradient-text">TrendStudio</span>
-                <span className="text-[10px] text-muted-foreground leading-none">Studio IA</span>
+                <span className="text-xl font-bold gradient-text">{t('common.appName')}</span>
+                <span className="text-[10px] text-muted-foreground leading-none">{t('common.tagline')}</span>
               </div>
             </Link>
 
@@ -255,8 +259,8 @@ export const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
                           <Sparkles className="w-7 h-7 text-white" />
                         </div>
                         <div className="flex flex-col">
-                          <span className="text-2xl font-bold gradient-text">TrendStudio</span>
-                          <span className="text-xs text-muted-foreground">Studio de création IA</span>
+                          <span className="text-2xl font-bold gradient-text">{t('common.appName')}</span>
+                          <span className="text-xs text-muted-foreground">{t('common.tagline')}</span>
                         </div>
                       </Link>
                     </div>

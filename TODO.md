@@ -177,6 +177,11 @@
   - [x] Fix navigation: add all new features to AppLayout navItems
   - [x] Update navigation labels to French
   - [x] Add icons for new features (Calendar, TrendingUp, BarChart3, GraduationCap, Users)
+  - [x] Implement i18n in AppLayout for complete language separation
+  - [x] Update all hardcoded texts to use translation keys
+  - [x] Verify French and English are completely distinct
+  - [x] Test language switcher functionality
+  - [x] Create LANGUAGE_TEST.md verification guide
 
 ## Notes
 - First registered user becomes admin automatically
