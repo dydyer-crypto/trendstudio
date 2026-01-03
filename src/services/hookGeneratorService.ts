@@ -1,520 +1,417 @@
 import { supabase } from '@/db/supabase';
-import { hookLibraryService } from './hookLibraryService';
 
 export interface HookCategory {
     id: string;
     name: string;
-    displayName: string;
+    display_name: string;
     description: string;
-    psychologicalPrinciple: string;
+    psychological_principle: string;
     color: string;
     icon: string;
-    successRate: number;
-    usageCount: number;
+    success_rate: number;
+    usage_count: number;
     examples: string[];
+    is_active: boolean;
+    created_at: string;
+    updated_at: string;
 }
 
-export interface HookGenerationRequest {
+export interface ContentHooks {
+    id: string;
+    user_id: string;
     topic: string;
-    targetAudience?: string;
-    platform: 'youtube' | 'tiktok' | 'instagram' | 'linkedin';
-    category?: string; // Optional: generate for specific category only
-    count?: number; // Number of hooks per category (default: 10)
+    target_audience?: string;
+    platform: string;
+    category_id?: string;
+    generated_hooks: GeneratedHook[];
+    best_performing_hook?: string;
+    performance_data: Record<string, any>;
+    prompt_used?: string;
+    ai_model: string;
+    is_saved: boolean;
+    created_at: string;
+    updated_at: string;
 }
 
 export interface GeneratedHook {
     id: string;
     text: string;
     category: string;
-    categoryName: string;
-    platform: string;
-    confidence: number; // AI confidence score
-    psychologicalTrigger: string;
-    estimatedEngagement: number; // Estimated engagement rate
-    characterCount: number;
-    readabilityScore: number; // Flesch reading ease score
+    category_name: string;
+    score: number; // 0-100 based on expected performance
+    platform_specific: boolean;
+    psychological_impact: string;
 }
 
-export interface HookGenerationResult {
-    id: string;
+export interface HookGenerationRequest {
     topic: string;
+    target_audience?: string;
     platform: string;
-    targetAudience?: string;
-    generatedHooks: GeneratedHook[];
-    promptUsed: string;
-    aiModel: string;
-    generationTime: number;
-    createdAt: string;
+    category?: string; // Specific category or 'all'
+    count?: number; // Number of hooks to generate per category
 }
 
 export class HookGeneratorService {
-    private categories: HookCategory[] = [];
+    private static instance: HookGeneratorService;
 
-    constructor() {
-        this.loadCategories();
-    }
+    private constructor() { }
 
-    /**
-     * Load hook categories from database
-     */
-    private async loadCategories(): Promise<void> {
-        try {
-            const { data, error } = await supabase
-                .from('hook_categories')
-                .select('*')
-                .eq('is_active', true)
-                .order('usage_count', { ascending: false });
-
-            if (error) throw error;
-
-            this.categories = data?.map(cat => ({
-                id: cat.id,
-                name: cat.name,
-                displayName: cat.display_name,
-                description: cat.description,
-                psychologicalPrinciple: cat.psychological_principle,
-                color: cat.color,
-                icon: cat.icon,
-                successRate: cat.success_rate,
-                usageCount: cat.usage_count,
-                examples: cat.examples || []
-            })) || [];
-        } catch (error) {
-            console.error('Failed to load hook categories:', error);
-            // Fallback to hardcoded categories
-            this.categories = this.getFallbackCategories();
+    static getInstance(): HookGeneratorService {
+        if (!HookGeneratorService.instance) {
+            HookGeneratorService.instance = new HookGeneratorService();
         }
+        return HookGeneratorService.instance;
     }
 
     /**
-     * Generate hooks for a given topic and platform
+     * Get all active hook categories
      */
-    async generateHooks(request: HookGenerationRequest): Promise<HookGenerationResult> {
-        const startTime = Date.now();
-        const hookCount = request.count || 10;
+    async getHookCategories(): Promise<HookCategory[]> {
+        const { data, error } = await supabase
+            .from('hook_categories')
+            .select('*')
+            .eq('is_active', true)
+            .order('usage_count', { ascending: false });
 
-        // Determine which categories to use
-        const targetCategories = request.category
-            ? this.categories.filter(cat => cat.name === request.category)
-            : this.categories;
+        if (error) {
+            console.error('Error fetching hook categories:', error);
+            throw new Error('Failed to fetch hook categories');
+        }
 
-        const allGeneratedHooks: GeneratedHook[] = [];
-        const promptsUsed: string[] = [];
+        return data || [];
+    }
+
+    /**
+     * Generate hooks for a given topic
+     */
+    async generateHooks(request: HookGenerationRequest): Promise<GeneratedHook[]> {
+        const categories = request.category && request.category !== 'all'
+            ? [request.category]
+            : ['curiosity', 'fear', 'gain', 'authority', 'social_proof', 'contrast', 'question', 'storytelling'];
+
+        const hooks: GeneratedHook[] = [];
+        const hooksPerCategory = request.count || 2;
+
+        // Get category details for prompts
+        const { data: categoryData } = await supabase
+            .from('hook_categories')
+            .select('name, display_name, psychological_principle, examples')
+            .in('name', categories);
+
+        const categoryMap = new Map(
+            categoryData?.map(cat => [cat.name, cat]) || []
+        );
 
         // Generate hooks for each category
-        for (const category of targetCategories) {
-            const categoryHooks = await this.generateHooksForCategory(
-                request.topic,
-                request.targetAudience,
-                request.platform,
-                category,
-                Math.ceil(hookCount / targetCategories.length)
-            );
+        for (const categoryName of categories) {
+            const category = categoryMap.get(categoryName);
+            if (!category) continue;
 
-            allGeneratedHooks.push(...categoryHooks);
-            promptsUsed.push(`Generated ${categoryHooks.length} hooks for ${category.displayName}`);
+            try {
+                const categoryHooks = await this.generateCategoryHooks(
+                    request.topic,
+                    request.target_audience,
+                    request.platform,
+                    categoryName,
+                    category,
+                    hooksPerCategory
+                );
+                hooks.push(...categoryHooks);
+            } catch (error) {
+                console.error(`Error generating hooks for category ${categoryName}:`, error);
+                // Continue with other categories
+            }
         }
 
-        // Create result record in database
-        const result: Omit<HookGenerationResult, 'id'> = {
-            topic: request.topic,
-            platform: request.platform,
-            targetAudience: request.targetAudience,
-            generatedHooks: allGeneratedHooks,
-            promptUsed: promptsUsed.join('; '),
-            aiModel: 'gemini-pro',
-            generationTime: Date.now() - startTime,
-            createdAt: new Date().toISOString()
-        };
-
-        // Save to database (optional - only if user wants to save)
-        // const savedResult = await this.saveHookGeneration(result);
-
-        return {
-            ...result,
-            id: `temp_${Date.now()}`, // Temporary ID for unsaved generations
-        };
+        // Sort by expected performance score
+        return hooks.sort((a, b) => b.score - a.score);
     }
 
     /**
-     * Generate hooks for a specific category
+     * Generate hooks for a specific category using AI
      */
-    private async generateHooksForCategory(
+    private async generateCategoryHooks(
         topic: string,
         targetAudience: string | undefined,
         platform: string,
-        category: HookCategory,
+        categoryName: string,
+        category: any,
         count: number
     ): Promise<GeneratedHook[]> {
-        const platformAdaptations = this.getPlatformAdaptations(platform);
-
-        const prompt = this.buildHookPrompt(
-            topic,
-            targetAudience,
-            category,
-            platformAdaptations,
-            count
-        );
+        const prompt = this.buildHookPrompt(topic, targetAudience, platform, category);
 
         try {
             // Call AI service to generate hooks
-            const aiResponse = await this.callAIService(prompt);
+            const aiResponse = await this.callAIGeneration(prompt, count);
 
-            // Parse and structure the response
-            const hooks = this.parseAIResponse(aiResponse, category, platform);
-
-            // Add metadata to each hook
-            return hooks.map((hook, index) => ({
-                ...hook,
-                category: category.name,
-                categoryName: category.displayName,
-                platform,
-                confidence: this.calculateConfidence(hook.text),
-                psychologicalTrigger: category.psychologicalPrinciple,
-                estimatedEngagement: this.estimateEngagement(hook.text, category, platform),
-                characterCount: hook.text.length,
-                readabilityScore: this.calculateReadability(hook.text),
+            return aiResponse.hooks.map((hookText: string, index: number) => ({
+                id: `${categoryName}_${Date.now()}_${index}`,
+                text: hookText,
+                category: categoryName,
+                category_name: category.display_name,
+                score: this.calculateHookScore(hookText, categoryName, platform),
+                platform_specific: platform !== 'youtube',
+                psychological_impact: category.psychological_principle
             }));
-
         } catch (error) {
-            console.error(`Failed to generate hooks for category ${category.name}:`, error);
-
-            // Return fallback hooks based on category examples
-            return category.examples.slice(0, count).map((example, index) => ({
-                id: `${category.name}_${index}`,
-                text: example,
-                category: category.name,
-                categoryName: category.displayName,
-                platform,
-                confidence: 0.5,
-                psychologicalTrigger: category.psychologicalPrinciple,
-                estimatedEngagement: category.successRate,
-                characterCount: example.length,
-                readabilityScore: 60,
-            }));
+            console.error('AI generation error:', error);
+            // Fallback to template-based generation
+            return this.generateFallbackHooks(topic, targetAudience, platform, categoryName, category, count);
         }
     }
 
     /**
-     * Build optimized prompt for hook generation
+     * Build AI prompt for hook generation
      */
     private buildHookPrompt(
         topic: string,
         targetAudience: string | undefined,
-        category: HookCategory,
-        platformAdaptations: any,
-        count: number
+        platform: string,
+        category: any
     ): string {
-        const audienceContext = targetAudience ? `pour une audience ${targetAudience}` : '';
-        const platformContext = platformAdaptations.description;
+        const audience = targetAudience ? ` pour ${targetAudience}` : '';
 
-        return `Tu es un expert en copywriting pour le contenu ${platformAdaptations.name}.
-Génère ${count} accroches (hooks) ultra-impactantes pour le sujet "${topic}" ${audienceContext}.
+        let platformContext = '';
+        switch (platform) {
+            case 'youtube':
+                platformContext = 'vidéo YouTube de 8-15 secondes';
+                break;
+            case 'tiktok':
+                platformContext = 'vidéo TikTok verticale de 15-60 secondes';
+                break;
+            case 'instagram':
+                platformContext = 'post Instagram (photo/vidéo courte)';
+                break;
+            case 'linkedin':
+                platformContext = 'publication LinkedIn professionnelle';
+                break;
+            default:
+                platformContext = 'contenu digital';
+        }
 
-STYLE: ${category.displayName} - ${category.psychologicalPrinciple}
-OBJECTIF: Attirer l'attention maximale dès les 3 premières secondes
+        return `En tant qu'expert en marketing de contenu, génère des accroches (hooks) pour une ${platformContext} sur le sujet "${topic}"${audience}.
 
-CONTRAINTES ${platformAdaptations.name}:
-- Longueur: ${platformAdaptations.maxLength} caractères max
-- Ton: ${platformAdaptations.tone}
-- Style: ${platformAdaptations.style}
+Catégorie psychologique : ${category.display_name}
+Principe : ${category.psychological_principle}
 
-EXEMPLES de ce style:
-${category.examples.slice(0, 3).map(ex => `- "${ex}"`).join('\n')}
+Exemples de cette catégorie :
+${category.examples.slice(0, 2).map((ex: string) => `- "${ex}"`).join('\n')}
 
-INSTRUCTIONS:
-1. Chaque hook doit utiliser le principe psychologique: ${category.psychologicalPrinciple}
-2. Adaptez le langage au contexte ${platformAdaptations.name}
-3. Rendez chaque hook unique et impactant
-4. Numérotez les hooks de 1 à ${count}
+RÈGLES IMPORTANTES :
+- Chaque accroche doit faire 8-15 mots maximum
+- Doit commencer par la technique psychologique appropriée
+- Optimisée pour ${platformContext}
+- Doit créer un besoin immédiat de continuer à regarder/lire
+- Utilise des chiffres, questions, ou comparaisons quand approprié
+- Ton : Engageant, mystérieux, ou urgent selon la catégorie
 
-Génère ${count} hooks originaux:`;
+Génère 2 accroches parfaites :`;
     }
 
     /**
-     * Get platform-specific adaptations
+     * Call AI service for hook generation
      */
-    private getPlatformAdaptations(platform: string): any {
-        const adaptations = {
-            youtube: {
-                name: 'YouTube',
-                description: 'vidéos longues (8-15 min)',
-                maxLength: 100,
-                tone: 'conversationnel et engageant',
-                style: 'questions rhétoriques, teasers, promesses de valeur'
-            },
-            tiktok: {
-                name: 'TikTok',
-                description: 'vidéos ultra-courtes (15-60 sec)',
-                maxLength: 80,
-                tone: 'énergique et direct',
-                style: 'chocs visuels, questions, contrastes extrêmes'
-            },
-            instagram: {
-                name: 'Instagram',
-                description: 'contenu visuel et lifestyle',
-                maxLength: 90,
-                tone: 'inspirant et relatable',
-                style: 'émotions, storytelling, communauté'
-            },
-            linkedin: {
-                name: 'LinkedIn',
-                description: 'contenu professionnel B2B',
-                maxLength: 120,
-                tone: 'expert et crédible',
-                style: 'autorité, insights, networking'
-            }
+    private async callAIGeneration(prompt: string, count: number): Promise<{ hooks: string[] }> {
+        // TODO: Integrate with actual AI service (Gemini, OpenAI, etc.)
+        // For now, return mock data
+        await new Promise(resolve => setTimeout(resolve, 1000)); // Simulate API call
+
+        // Mock AI response based on category
+        const mockResponses = {
+            curiosity: [
+                "Ce secret va révolutionner votre façon de créer",
+                "Vous ne croirez jamais cette découverte incroyable"
+            ],
+            fear: [
+                "Si vous ne changez pas maintenant, il sera trop tard",
+                "Le risque que vous prenez sans le savoir"
+            ],
+            gain: [
+                "Gagnez 10x plus de vues en seulement 30 jours",
+                "Le secret pour doubler vos revenus cette année"
+            ],
+            authority: [
+                "En tant qu'expert avec 500k abonnés, voici la vérité",
+                "Après 10 ans dans l'industrie, ce que j'ai découvert"
+            ],
+            social_proof: [
+                "Comment j'ai aidé 10k créateurs à exploser leur audience",
+                "Ce que font tous les top créateurs que personne ne dit"
+            ],
+            contrast: [
+                "Avant : 100 vues. Après : 10k vues. Voici comment",
+                "La différence entre amateur et professionnel"
+            ],
+            question: [
+                "Pourquoi 99% des créateurs échouent-ils ?",
+                "Savez-vous vraiment optimiser vos contenus ?"
+            ],
+            storytelling: [
+                "Il était une fois un créateur comme vous...",
+                "L'histoire vraie qui a changé ma carrière pour toujours"
+            ]
         };
 
-        return adaptations[platform as keyof typeof adaptations] || adaptations.youtube;
+        return {
+            hooks: mockResponses.curiosity // Default fallback
+        };
     }
 
     /**
-     * Call AI service (placeholder - would integrate with actual AI API)
+     * Calculate expected performance score for a hook
      */
-    private async callAIService(prompt: string): Promise<string> {
-        // This would normally call your AI service (OpenAI, Anthropic, etc.)
-        // For now, return mock responses based on the prompt
+    private calculateHookScore(hookText: string, category: string, platform: string): number {
+        let score = 50; // Base score
 
-        const categoryMatch = prompt.match(/STYLE: (.+?) -/);
-        const category = categoryMatch ? categoryMatch[1] : 'Curiosité';
+        // Length scoring (8-15 words is ideal)
+        const wordCount = hookText.split(/\s+/).length;
+        if (wordCount >= 8 && wordCount <= 15) score += 15;
+        else if (wordCount < 8) score -= 10;
 
-        // Generate mock hooks based on category
-        const mockHooks = this.generateMockHooks(category, 5);
+        // Question marks for engagement
+        if (hookText.includes('?')) score += 10;
 
-        return mockHooks.map((hook, i) => `${i + 1}. ${hook}`).join('\n');
+        // Numbers for specificity
+        if (/\d+/.test(hookText)) score += 5;
+
+        // Platform-specific optimizations
+        if (platform === 'tiktok' && hookText.length < 50) score += 5;
+        if (platform === 'youtube' && wordCount <= 12) score += 5;
+
+        // Category-specific bonuses
+        const highPerformingCategories = ['curiosity', 'fear', 'gain'];
+        if (highPerformingCategories.includes(category)) score += 10;
+
+        return Math.min(100, Math.max(0, score));
     }
 
     /**
-     * Parse AI response into structured hooks
+     * Fallback hook generation using templates
      */
-    private parseAIResponse(response: string, category: HookCategory, platform: string): Array<{ id: string, text: string, promptUsed: string }> {
-        const lines = response.split('\n').filter(line => line.trim());
-        const hooks: Array<{ id: string, text: string, promptUsed: string }> = [];
+    private generateFallbackHooks(
+        topic: string,
+        targetAudience: string | undefined,
+        platform: string,
+        categoryName: string,
+        category: any,
+        count: number
+    ): GeneratedHook[] {
+        const templates = this.getHookTemplates(categoryName);
+        const hooks: GeneratedHook[] = [];
 
-        lines.forEach((line, index) => {
-            const match = line.match(/^\d+\.\s*(.+)$/);
-            if (match) {
-                hooks.push({
-                    id: `${category.name}_${platform}_${index}`,
-                    text: match[1].trim(),
-                    promptUsed: 'AI generated hook'
-                });
+        for (let i = 0; i < Math.min(count, templates.length); i++) {
+            const template = templates[i];
+            let hookText = template.replace('{topic}', topic);
+
+            if (targetAudience) {
+                hookText = hookText.replace('{audience}', targetAudience);
             }
-        });
+
+            hooks.push({
+                id: `${categoryName}_fallback_${Date.now()}_${i}`,
+                text: hookText,
+                category: categoryName,
+                category_name: category.display_name,
+                score: 60 + Math.random() * 20, // Random score between 60-80
+                platform_specific: false,
+                psychological_impact: category.psychological_principle
+            });
+        }
 
         return hooks;
     }
 
     /**
-     * Generate mock hooks for demo purposes
+     * Get hook templates for fallback generation
      */
-    private generateMockHooks(category: string, count: number): string[] {
-        const hooksByCategory: Record<string, string[]> = {
-            'Curiosité': [
-                'Ce secret va révolutionner votre façon de créer du contenu',
-                'Vous ne croirez jamais ce que j\'ai découvert sur les algorithmes',
-                'La technique cachée que personne ne veut que vous connaissiez',
-                'Ce que YouTube ne vous dit pas sur les vues',
-                'L\'erreur que font 99% des créateurs débutants'
+    private getHookTemplates(category: string): string[] {
+        const templates = {
+            curiosity: [
+                "Ce secret sur {topic} va tout changer",
+                "Vous ne croirez jamais ce que j'ai découvert sur {topic}"
             ],
-            'Peur': [
-                'Si vous ne changez pas maintenant, votre chaîne va mourir',
-                'Le risque invisible qui détruit vos vidéos',
-                'Pourquoi vos concurrents vous dépassent sans effort',
-                'L\'erreur coûteuse que vous faites tous les jours',
-                'Ce qui va tuer votre créativité pour toujours'
+            fear: [
+                "Si vous ignorez {topic}, vous regretterez",
+                "Le danger de {topic} que personne ne voit"
             ],
-            'Gain': [
-                'Gagnez 10x plus de vues avec cette méthode simple',
-                'Comment atteindre 100k abonnés en 90 jours',
-                'La stratégie qui a multiplié mes revenus par 5',
-                'Devenez viral avec cette technique prouvée',
-                'Le secret pour monétiser votre passion'
+            gain: [
+                "Comment {topic} peut vous rapporter 10x plus",
+                "Le secret de {topic} pour réussir rapidement"
             ],
-            'Autorité': [
-                'En tant qu\'expert avec 500k abonnés, voici la vérité',
-                'Après avoir analysé 10,000 vidéos, j\'ai trouvé ça',
-                'Ce que 7 ans d\'expérience m\'ont appris',
-                'L\'expertise que personne d\'autre ne peut vous donner',
-                'Les insights d\'un pro avec 1M d\'heures vues'
+            authority: [
+                "En tant qu'expert, voici la vérité sur {topic}",
+                "Après des années, ce que j'ai appris sur {topic}"
             ],
-            'Preuve Sociale': [
-                'Comment j\'ai aidé 10k créateurs à exploser leur audience',
-                'Ce que font tous les top créateurs pour réussir',
-                'La méthode utilisée par les influenceurs millionnaires',
-                'Pourquoi 85% des créateurs qui suivent ça réussissent',
-                'L\'approche qui a fait passer mes vidéos de 1k à 1M vues'
+            social_proof: [
+                "Comment {topic} a transformé la carrière de milliers",
+                "Ce que tous les experts utilisent pour {topic}"
+            ],
+            contrast: [
+                "Avant et après {topic} : la différence incroyable",
+                "Pourquoi {topic} fonctionne quand rien d'autre ne marche"
+            ],
+            question: [
+                "Pourquoi {topic} est-il si important ?",
+                "Connaissez-vous vraiment les secrets de {topic} ?"
+            ],
+            storytelling: [
+                "L'histoire incroyable derrière {topic}",
+                "Il était une fois {topic} qui a changé ma vie"
             ]
         };
 
-        return hooksByCategory[category] || hooksByCategory['Curiosité'];
+        return templates[category as keyof typeof templates] || templates.curiosity;
     }
 
     /**
-     * Calculate confidence score for a hook (0-1)
+     * Save generated hooks to database
      */
-    private calculateConfidence(hookText: string): number {
-        let score = 0.5; // Base score
-
-        // Length optimization
-        if (hookText.length > 20 && hookText.length < 100) score += 0.2;
-
-        // Question marks (engagement)
-        if (hookText.includes('?')) score += 0.1;
-
-        // Numbers (specificity)
-        if (/\d+/.test(hookText)) score += 0.1;
-
-        // Emotional words
-        const emotionalWords = ['secret', 'vérité', 'erreur', 'révolution', 'exploser', 'mourir', 'tuer'];
-        if (emotionalWords.some(word => hookText.toLowerCase().includes(word))) score += 0.1;
-
-        return Math.min(1, Math.max(0, score));
-    }
-
-    /**
-     * Estimate engagement rate for a hook
-     */
-    private estimateEngagement(hookText: string, category: HookCategory, platform: string): number {
-        let baseRate = category.successRate || 2.5; // Base 2.5% engagement
-
-        // Platform multipliers
-        const platformMultiplier = {
-            tiktok: 1.5, // TikTok has higher engagement
-            instagram: 1.3,
-            youtube: 1.0,
-            linkedin: 0.8
-        };
-
-        return baseRate * (platformMultiplier[platform as keyof typeof platformMultiplier] || 1.0);
-    }
-
-    /**
-     * Calculate readability score (simplified)
-     */
-    private calculateReadability(text: string): number {
-        const words = text.split(' ').length;
-        const sentences = text.split(/[.!?]+/).length;
-        const avgWordsPerSentence = words / sentences;
-
-        // Simplified Flesch score approximation
-        let score = 206.835 - (1.015 * avgWordsPerSentence) - (84.6 * (words / 100));
-
-        return Math.max(0, Math.min(100, score));
-    }
-
-    /**
-     * Get fallback categories if database fails
-     */
-    private getFallbackCategories(): HookCategory[] {
-        return [
-            {
-                id: 'curiosity',
-                name: 'curiosity',
-                displayName: 'Curiosité',
-                description: 'Éveille la curiosité naturelle',
-                psychologicalPrinciple: 'Principe de curiosité informationnelle',
-                color: '#8B5CF6',
-                icon: 'Eye',
-                successRate: 3.2,
-                usageCount: 0,
-                examples: ['Ce secret va changer votre façon de créer']
-            },
-            // Add other categories...
-        ];
-    }
-
-    /**
-     * Save hook generation to database
-     */
-    async saveHookGeneration(result: HookGenerationResult, userId: string): Promise<HookGenerationResult> {
+    async saveGeneratedHooks(
+        userId: string,
+        request: HookGenerationRequest,
+        hooks: GeneratedHook[],
+        prompt: string
+    ): Promise<ContentHooks> {
         const { data, error } = await supabase
             .from('content_hooks')
             .insert({
                 user_id: userId,
-                topic: result.topic,
-                target_audience: result.targetAudience,
-                platform: result.platform,
-                generated_hooks: result.generatedHooks,
-                prompt_used: result.promptUsed,
-                ai_model: result.aiModel,
+                topic: request.topic,
+                target_audience: request.target_audience,
+                platform: request.platform,
+                generated_hooks: hooks,
+                prompt_used: prompt,
                 is_saved: true
             })
             .select()
             .single();
 
-        if (error) throw error;
+        if (error) {
+            console.error('Error saving hooks:', error);
+            throw new Error('Failed to save generated hooks');
+        }
 
-        return { ...result, id: data.id };
+        return data;
     }
 
     /**
-     * Get hook categories for UI
+     * Get user's hook history
      */
-    async getCategories(): Promise<HookCategory[]> {
-        if (this.categories.length === 0) {
-            await this.loadCategories();
-        }
-        return this.categories;
-    }
+    async getUserHooks(userId: string, limit = 20): Promise<ContentHooks[]> {
+        const { data, error } = await supabase
+            .from('content_hooks')
+            .select('*')
+            .eq('user_id', userId)
+            .order('created_at', { ascending: false })
+            .limit(limit);
 
-    /**
-     * Save a generated hook to the user's library
-     */
-    async saveHookToLibrary(
-        hookText: string,
-        topic?: string,
-        platform?: string,
-        categoryId?: string,
-        tags?: string[]
-    ) {
-        try {
-            const savedHook = await hookLibraryService.addHook({
-                hookText,
-                topic,
-                platform,
-                categoryId,
-                tags: tags || [],
-                performanceScore: 0 // Will be updated based on usage
-            });
-            return savedHook;
-        } catch (error) {
-            console.error('Failed to save hook to library:', error);
-            throw error;
+        if (error) {
+            console.error('Error fetching user hooks:', error);
+            throw new Error('Failed to fetch user hooks');
         }
-    }
 
-    /**
-     * Save multiple generated hooks to library
-     */
-    async saveMultipleHooksToLibrary(
-        hooks: Array<{
-            text: string;
-            category?: string;
-            platform?: string;
-        }>,
-        topic?: string,
-        platform?: string
-    ) {
-        const savedHooks = [];
-        for (const hook of hooks) {
-            try {
-                const category = this.categories.find(c => c.name === hook.category);
-                const savedHook = await this.saveHookToLibrary(
-                    hook.text,
-                    topic,
-                    hook.platform || platform,
-                    category?.id
-                );
-                savedHooks.push(savedHook);
-            } catch (error) {
-                console.error('Failed to save hook:', hook.text, error);
-                // Continue with other hooks
-            }
-        }
-        return savedHooks;
+        return data || [];
     }
 }
 
-export const hookGeneratorService = new HookGeneratorService();
+export const hookGeneratorService = HookGeneratorService.getInstance();
