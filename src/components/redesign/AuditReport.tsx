@@ -23,7 +23,7 @@ import { crmService } from "@/services/crm";
 import { useAuth } from "@/contexts/AuthContext";
 import { useState } from "react";
 import { toast } from "sonner";
-import { Send, CheckCircle } from "lucide-react";
+import { Send } from "lucide-react";
 
 interface AuditReportProps {
     results: ConsultantReport & { url: string; performance: number; seo: number; mobile: number; security: number };

@@ -1,7 +1,8 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { ContentTypeSelector, ContentType } from "@/components/aio/ContentTypeSelector";
 import { SEOOptimizer } from "@/components/aio/SEOOptimizer";
 import { AIOEditor } from "@/components/aio/AIOEditor";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -10,7 +11,9 @@ import { toast } from "sonner";
 import { supabase } from "@/db/supabase";
 import { useAuth } from "@/contexts/AuthContext";
 import { aiConsultant } from "@/services/aiConsultant";
+import { brandKitService } from "@/services/brandKitService";
 import { Badge } from "@/components/ui/badge";
+import type { BrandKit } from "@/services/brandKitService";
 
 export default function AIOPage() {
     const [contentType, setContentType] = useState<ContentType | null>(null);
@@ -19,7 +22,23 @@ export default function AIOPage() {
     const [tone, setTone] = useState(50);
     const [generatedContent, setGeneratedContent] = useState("");
     const [isGenerating, setIsGenerating] = useState(false);
+    const [brandKit, setBrandKit] = useState<BrandKit | null>(null);
     const { user } = useAuth();
+
+    useEffect(() => {
+        if (user) {
+            loadBrandKit();
+        }
+    }, [user]);
+
+    const loadBrandKit = async () => {
+        try {
+            const activeKit = await brandKitService.getActiveBrandKit(user!.id);
+            setBrandKit(activeKit);
+        } catch (error) {
+            console.error('Error loading brand kit:', error);
+        }
+    };
 
     const handleGenerate = async () => {
         if (!topic.trim() || !contentType) {
@@ -158,6 +177,9 @@ export default function AIOPage() {
                             onChange={setGeneratedContent}
                             onSave={handleSave}
                             isGenerating={isGenerating}
+                            brandKit={brandKit}
+                            contentType={contentType || undefined}
+                            topic={topic}
                         />
                     </div>
                 </div>

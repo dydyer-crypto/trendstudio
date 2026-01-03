@@ -1,6 +1,7 @@
 import jsPDF from 'jspdf';
 import 'jspdf-autotable';
 import type { ConsultantReport } from './aiConsultant';
+import type { BrandKit } from './brandKitService';
 
 export class PDFService {
     private static instance: PDFService;
@@ -15,9 +16,16 @@ export class PDFService {
     }
 
     async generateQuotePDF(report: ConsultantReport & { url: string }): Promise<void> {
+        await this.generateQuotePDFWithBrand(report, null);
+    }
+
+    async generateQuotePDFWithBrand(report: ConsultantReport & { url: string }, brandKit: BrandKit | null): Promise<void> {
         const doc = new jsPDF();
-        const primaryColor = [79, 70, 229]; // Indigo-600
-        const secondaryColor = [31, 41, 55]; // Gray-800
+
+        // Use brand kit colors or defaults
+        const primaryColor = brandKit ? this.hexToRgb(brandKit.primary_color) : [79, 70, 229]; // Indigo-600
+        const secondaryColor = brandKit ? this.hexToRgb(brandKit.secondary_color) : [31, 41, 55]; // Gray-800
+        const brandName = brandKit?.name || 'TRENDSTUDIO';
 
         // --- Header Block ---
         doc.setFillColor(primaryColor[0], primaryColor[1], primaryColor[2]);
@@ -26,7 +34,7 @@ export class PDFService {
         doc.setTextColor(255, 255, 255);
         doc.setFontSize(28);
         doc.setFont('helvetica', 'bold');
-        doc.text('TRENDSTUDIO', 20, 28);
+        doc.text(brandName.toUpperCase(), 20, 28);
 
         doc.setFontSize(10);
         doc.setFont('helvetica', 'normal');
@@ -80,24 +88,8 @@ export class PDFService {
         doc.text(summaryLines, 20, yPos);
         yPos += (summaryLines.length * 5) + 10;
 
-        // Visual Specs
-        if (report.visual_specs) {
-            doc.setFontSize(12);
-            doc.setFont('helvetica', 'bold');
-            doc.setTextColor(primaryColor[0], primaryColor[1], primaryColor[2]);
-            doc.text('2. ANALYSE VISUELLE DU SITE ACTUEL', 20, yPos);
-            yPos += 8;
-
-            doc.setFontSize(10);
-            doc.setFont('helvetica', 'normal');
-            doc.setTextColor(secondaryColor[0], secondaryColor[1], secondaryColor[2]);
-            doc.text(`Ambiance détectée : ${report.visual_specs.vibe}`, 25, yPos);
-            yPos += 5;
-            doc.text(`Polices : ${report.visual_specs.fonts.join(', ')}`, 25, yPos);
-            yPos += 5;
-            doc.text(`Couleurs principales : ${report.visual_specs.colors.join(', ')}`, 25, yPos);
-            yPos += 12;
-        }
+        // Visual Specs - Placeholder for future visual analysis
+        // TODO: Add visual analysis section when visual_specs is available in ConsultantReport type
 
         // Redesign Variants
         doc.setFontSize(12);
@@ -214,7 +206,7 @@ export class PDFService {
             doc.setFontSize(7);
             doc.setTextColor(150, 150, 150);
             doc.text(
-                `TrendStudio AI Consultant - Devis TS-CONFIDENTIAL - Page ${i}/${pageCount}`,
+                `${brandName} AI Consultant - Devis TS-CONFIDENTIAL - Page ${i}/${pageCount}`,
                 105,
                 290,
                 { align: 'center' }
@@ -222,6 +214,137 @@ export class PDFService {
         }
 
         doc.save(`Devis_Refonte_${report.url.replace(/https?:\/\/|\/|www\./g, '')}.pdf`);
+    }
+
+    async generateAIOContentPDF(content: string, topic: string, contentType: string, brandKit?: BrandKit | null): Promise<void> {
+        const doc = new jsPDF();
+
+        // Extract colors from brand kit or use defaults
+        const primaryColor = brandKit ? this.hexToRgb(brandKit.primary_color) : [79, 70, 229]; // Indigo-600
+        const secondaryColor = brandKit ? this.hexToRgb(brandKit.secondary_color) : [31, 41, 55]; // Gray-800
+        const accentColor = brandKit ? this.hexToRgb(brandKit.accent_color) : [139, 92, 246]; // Violet-500
+
+        // --- Header Block ---
+        doc.setFillColor(primaryColor[0], primaryColor[1], primaryColor[2]);
+        doc.rect(0, 0, 210, 50, 'F');
+
+        // Add logo if available
+        if (brandKit?.logo_url) {
+            try {
+                // Note: In a real implementation, you'd need to load and add the logo image
+                // For now, we'll use text branding
+            } catch (error) {
+                console.warn('Could not load logo for PDF');
+            }
+        }
+
+        doc.setTextColor(255, 255, 255);
+        doc.setFontSize(24);
+        doc.setFont('helvetica', 'bold');
+
+        // Use brand name if available
+        const brandName = brandKit?.name || 'TRENDSTUDIO';
+        doc.text(brandName.toUpperCase(), 20, 25);
+
+        doc.setFontSize(10);
+        doc.setFont('helvetica', 'normal');
+        doc.text('Contenu IA Premium', 20, 35);
+
+        // Company Contact Info (Right Aligned)
+        doc.setFontSize(9);
+        doc.text('Studio de création IA', 190, 20, { align: 'right' });
+        doc.text('contact@trendstudio.ai', 190, 26, { align: 'right' });
+        doc.text('www.trendstudio.ai', 190, 32, { align: 'right' });
+
+        // Meta Data (Box)
+        doc.setFillColor(249, 250, 251);
+        doc.rect(140, 55, 50, 20, 'F');
+        doc.setFontSize(9);
+        doc.setTextColor(secondaryColor[0], secondaryColor[1], secondaryColor[2]);
+        doc.text(`Type : ${contentType}`, 145, 62);
+        doc.text(`Date : ${new Date().toLocaleDateString('fr-FR')}`, 145, 68);
+
+        // --- Content Section ---
+        let yPos = 85;
+
+        // Title
+        doc.setTextColor(primaryColor[0], primaryColor[1], primaryColor[2]);
+        doc.setFontSize(18);
+        doc.setFont('helvetica', 'bold');
+        doc.text(topic, 20, yPos);
+        yPos += 15;
+
+        // Separator line
+        doc.setDrawColor(primaryColor[0], primaryColor[1], primaryColor[2]);
+        doc.setLineWidth(1);
+        doc.line(20, yPos, 80, yPos);
+        yPos += 10;
+
+        // Content
+        doc.setFontSize(11);
+        doc.setFont('helvetica', 'normal');
+        doc.setTextColor(secondaryColor[0], secondaryColor[1], secondaryColor[2]);
+
+        const contentLines = doc.splitTextToSize(content, 170);
+        doc.text(contentLines, 20, yPos);
+
+        yPos += (contentLines.length * 5) + 15;
+
+        // Brand voice section if available
+        if (brandKit?.brand_voice) {
+            if (yPos > 220) {
+                doc.addPage();
+                yPos = 30;
+            }
+
+            doc.setFontSize(12);
+            doc.setFont('helvetica', 'bold');
+            doc.setTextColor(primaryColor[0], primaryColor[1], primaryColor[2]);
+            doc.text('TONALITÉ & STYLE DE MARQUE', 20, yPos);
+            yPos += 8;
+
+            doc.setFontSize(10);
+            doc.setFont('helvetica', 'normal');
+            doc.setTextColor(secondaryColor[0], secondaryColor[1], secondaryColor[2]);
+
+            if (brandKit.brand_voice.tone?.length > 0) {
+                doc.text(`Ton : ${brandKit.brand_voice.tone.join(', ')}`, 25, yPos);
+                yPos += 6;
+            }
+            if (brandKit.brand_voice.style?.length > 0) {
+                doc.text(`Style : ${brandKit.brand_voice.style.join(', ')}`, 25, yPos);
+                yPos += 6;
+            }
+            if (brandKit.brand_voice.keywords?.length > 0) {
+                doc.text(`Mots-clés : ${brandKit.brand_voice.keywords.join(', ')}`, 25, yPos);
+                yPos += 10;
+            }
+        }
+
+        // Footer for all pages
+        const pageCount = (doc as any).internal.getNumberOfPages();
+        for (let i = 1; i <= pageCount; i++) {
+            doc.setPage(i);
+            doc.setFontSize(7);
+            doc.setTextColor(150, 150, 150);
+            doc.text(
+                `${brandName} - Contenu IA - Page ${i}/${pageCount}`,
+                105,
+                290,
+                { align: 'center' }
+            );
+        }
+
+        doc.save(`Contenu_${contentType}_${topic.replace(/[^a-zA-Z0-9]/g, '_')}.pdf`);
+    }
+
+    private hexToRgb(hex: string): [number, number, number] {
+        const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+        return result ? [
+            parseInt(result[1], 16),
+            parseInt(result[2], 16),
+            parseInt(result[3], 16)
+        ] : [79, 70, 229]; // Default indigo
     }
 }
 

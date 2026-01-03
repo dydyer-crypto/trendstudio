@@ -1,20 +1,46 @@
 
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
-import { Copy, RefreshCw, Save } from "lucide-react";
+import { Copy, RefreshCw, Save, FileText } from "lucide-react";
 import { toast } from "sonner";
+import { pdfService } from "@/services/pdfService";
+import type { BrandKit } from "@/services/brandKitService";
 
 interface AIOEditorProps {
     content: string;
     onChange: (content: string) => void;
     onSave: () => void;
     isGenerating: boolean;
+    brandKit?: BrandKit | null;
+    contentType?: string;
+    topic?: string;
 }
 
-export function AIOEditor({ content, onChange, onSave, isGenerating }: AIOEditorProps) {
+export function AIOEditor({ content, onChange, onSave, isGenerating, brandKit, contentType, topic }: AIOEditorProps) {
     const handleCopy = () => {
         navigator.clipboard.writeText(content);
         toast.success("Contenu copié dans le presse-papier");
+    };
+
+    const handleExportPDF = async () => {
+        if (!content.trim() || !topic || !contentType) {
+            toast.error("Contenu insuffisant pour l'export PDF");
+            return;
+        }
+
+        try {
+            toast.info("Génération du PDF en cours...");
+            await pdfService.generateAIOContentPDF(
+                content,
+                topic,
+                contentType,
+                brandKit
+            );
+            toast.success("PDF exporté avec succès !");
+        } catch (error) {
+            console.error("PDF export error:", error);
+            toast.error("Erreur lors de l'export PDF");
+        }
     };
 
     return (
@@ -24,6 +50,9 @@ export function AIOEditor({ content, onChange, onSave, isGenerating }: AIOEditor
                 <div className="flex gap-2">
                     <Button variant="outline" size="sm" onClick={handleCopy} disabled={!content}>
                         <Copy className="mr-2 h-4 w-4" /> Copier
+                    </Button>
+                    <Button variant="outline" size="sm" onClick={handleExportPDF} disabled={!content}>
+                        <FileText className="mr-2 h-4 w-4" /> PDF
                     </Button>
                     <Button size="sm" onClick={onSave} disabled={!content || isGenerating}>
                         <Save className="mr-2 h-4 w-4" /> Enregistrer

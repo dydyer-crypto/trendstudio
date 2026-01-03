@@ -1,5 +1,5 @@
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -7,11 +7,12 @@ import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
-import { Palette, Upload, Check, Trash2, Sparkles, Wand2, Type, Layout, Plus, Image as ImageIcon, FileText } from 'lucide-react';
+import { Palette, Upload, Check, Trash2, Sparkles, Wand2, Type, Layout, Plus, Image as ImageIcon, FileText, X } from 'lucide-react';
 import { supabase } from '@/db/supabase';
 import { useAuth } from '@/contexts/AuthContext';
 import { toast } from 'sonner';
 import { brandKitService, type BrandKit, type BrandAsset } from '@/services/brandKitService';
+import { useSupabaseUpload } from '@/hooks/use-supabase-upload';
 
 export default function BrandStudioPage() {
     const { user } = useAuth();
@@ -20,6 +21,16 @@ export default function BrandStudioPage() {
     const [currentKit, setCurrentKit] = useState<BrandKit | null>(null);
     const [brandAssets, setBrandAssets] = useState<BrandAsset[]>([]);
     const [selectedFont, setSelectedFont] = useState('Inter');
+
+    // Upload functionality for logo
+    const uploadHook = useSupabaseUpload({
+        bucketName: 'trendstudio-images',
+        path: user?.id ? `brand-assets/${user.id}` : '',
+        allowedMimeTypes: ['image/png', 'image/jpeg', 'image/svg+xml', 'image/webp'],
+        maxFileSize: 5 * 1024 * 1024, // 5MB
+        maxFiles: 1,
+        supabase
+    });
 
     const googleFonts = [
         'Inter', 'Roboto', 'Open Sans', 'Lato', 'Montserrat',
@@ -119,6 +130,43 @@ export default function BrandStudioPage() {
             toast.success('Couleurs extraites automatiquement depuis le logo !');
         } catch (error) {
             toast.error('Erreur lors de l\'extraction des couleurs');
+        }
+    };
+
+    const handleLogoUpload = useCallback(async () => {
+        if (!currentKit || !user) return;
+
+        try {
+            await uploadHook.onUpload();
+
+            if (uploadHook.isSuccess && uploadHook.successes.length > 0) {
+                const logoUrl = `https://your-supabase-url.supabase.co/storage/v1/object/public/trendstudio-images/${user.id ? `brand-assets/${user.id}/` : ''}${uploadHook.successes[0]}`;
+
+                // Update the brand kit with the logo URL
+                const updatedKit = { ...currentKit, logo_url: logoUrl };
+                await brandKitService.updateBrandKit(currentKit.id, updatedKit);
+                setCurrentKit(updatedKit);
+
+                toast.success('Logo uploadé avec succès !');
+
+                // Clear uploaded files
+                uploadHook.setFiles([]);
+            }
+        } catch (error) {
+            toast.error('Erreur lors de l\'upload du logo');
+        }
+    }, [currentKit, user, uploadHook]);
+
+    const handleRemoveLogo = async () => {
+        if (!currentKit || !user) return;
+
+        try {
+            const updatedKit = { ...currentKit, logo_url: undefined };
+            await brandKitService.updateBrandKit(currentKit.id, updatedKit);
+            setCurrentKit(updatedKit);
+            toast.success('Logo supprimé');
+        } catch (error) {
+            toast.error('Erreur lors de la suppression du logo');
         }
     };
 
