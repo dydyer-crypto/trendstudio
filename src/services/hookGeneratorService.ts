@@ -114,7 +114,8 @@ export class HookGeneratorService {
                     request.platform,
                     categoryName,
                     category,
-                    hooksPerCategory
+                    hooksPerCategory,
+                    request
                 );
                 hooks.push(...categoryHooks);
             } catch (error) {
@@ -136,7 +137,8 @@ export class HookGeneratorService {
         platform: string,
         categoryName: string,
         category: any,
-        count: number
+        count: number,
+        request: HookGenerationRequest
     ): Promise<GeneratedHook[]> {
         const prompt = this.buildHookPrompt(topic, targetAudience, platform, category);
 
@@ -144,15 +146,20 @@ export class HookGeneratorService {
             // Call AI service to generate hooks
             const aiResponse = await this.callAIGeneration(prompt, count);
 
-            return aiResponse.hooks.map((hookText: string, index: number) => ({
-                id: `${categoryName}_${Date.now()}_${index}`,
-                text: hookText,
-                category: categoryName,
-                category_name: category.display_name,
-                score: this.calculateHookScore(hookText, categoryName, platform),
-                platform_specific: platform !== 'youtube',
-                psychological_impact: category.psychological_principle
-            }));
+            return aiResponse.hooks.map((hookText: string, index: number) => {
+                const topicAnalysis = this.analyzeTopic(request.topic);
+                const baseScore = this.calculateHookScore(hookText, categoryName, platform, topicAnalysis);
+
+                return {
+                    id: `${categoryName}_${Date.now()}_${index}`,
+                    text: hookText,
+                    category: categoryName,
+                    category_name: category.display_name,
+                    score: baseScore,
+                    platform_specific: platform !== 'youtube',
+                    psychological_impact: category.psychological_principle
+                };
+            });
         } catch (error) {
             console.error('AI generation error:', error);
             // Fallback to template-based generation
@@ -161,7 +168,7 @@ export class HookGeneratorService {
     }
 
     /**
-     * Build AI prompt for hook generation
+     * Build enhanced AI prompt for hook generation with contextual analysis
      */
     private buildHookPrompt(
         topic: string,
@@ -169,43 +176,184 @@ export class HookGeneratorService {
         platform: string,
         category: any
     ): string {
+        const topicAnalysis = this.analyzeTopic(topic);
         const audience = targetAudience ? ` pour ${targetAudience}` : '';
+        const platformSpecs = this.getPlatformSpecifications(platform);
 
-        let platformContext = '';
-        switch (platform) {
-            case 'youtube':
-                platformContext = 'vidéo YouTube de 8-15 secondes';
-                break;
-            case 'tiktok':
-                platformContext = 'vidéo TikTok verticale de 15-60 secondes';
-                break;
-            case 'instagram':
-                platformContext = 'post Instagram (photo/vidéo courte)';
-                break;
-            case 'linkedin':
-                platformContext = 'publication LinkedIn professionnelle';
-                break;
-            default:
-                platformContext = 'contenu digital';
+        return `Tu es un expert en copywriting viral avec 10 ans d'expérience. Génère des hooks ultra-performants.
+
+CONTEXTE :
+- Sujet : "${topic}"
+- Analyse du sujet : ${topicAnalysis.description}
+- Audience cible : ${targetAudience || 'Générale (18-45 ans)'}
+- Plateforme : ${platformSpecs.name} (${platformSpecs.format})
+- Longueur optimale : ${platformSpecs.hookLength} mots
+- Style de plateforme : ${platformSpecs.style}
+
+CATÉGORIE PSYCHOLOGIQUE : ${category.display_name}
+Principe fondamental : ${category.psychological_principle}
+
+TECHNIQUES SPÉCIFIQUES pour ${category.name} :
+${this.getCategoryTechniques(category.name, topicAnalysis)}
+
+EXEMPLES RÉUSSIS :
+${category.examples.slice(0, 3).map((ex: string) => `- "${ex}"`).join('\n')}
+
+RÈGLES DE GÉNÉRATION :
+✅ 8-12 mots maximum (idéal pour rétention)
+✅ Commence par un déclencheur psychologique fort
+✅ Crée FOMO (peur de manquer) immédiat
+✅ Optimisé pour ${platform} (rythme et style)
+✅ Ton : ${this.getCategoryTone(category.name)}
+✅ Utilise : ${topicAnalysis.powerWords.join(', ')}
+${platformSpecs.constraints}
+
+Génère 3 accroches exceptionnelles classées par potentiel viral :`;
+    }
+
+    /**
+     * Analyze topic to extract key elements and power words
+     */
+    private analyzeTopic(topic: string): { description: string, powerWords: string[], category: string } {
+        const lowerTopic = topic.toLowerCase();
+
+        // Analyze topic type and extract power words
+        const analysis = {
+            powerWords: [] as string[],
+            description: '',
+            category: 'general'
+        };
+
+        // Extract numbers and metrics
+        const numbers = topic.match(/\d+/g);
+        if (numbers) {
+            analysis.powerWords.push(...numbers.map(n => n + '%'), 'résultats', 'preuves');
         }
 
-        return `En tant qu'expert en marketing de contenu, génère des accroches (hooks) pour une ${platformContext} sur le sujet "${topic}"${audience}.
+        // Category-specific analysis
+        if (lowerTopic.includes('ia') || lowerTopic.includes('intelligence artificielle')) {
+            analysis.category = 'tech';
+            analysis.powerWords.push('révolutionnaire', 'futur', 'automatisé', 'intelligent');
+            analysis.description = 'Sujet technologique innovant sur l\'IA';
+        } else if (lowerTopic.includes('argent') || lowerTopic.includes('revenus') || lowerTopic.includes('business')) {
+            analysis.category = 'business';
+            analysis.powerWords.push('riche', 'liberté', 'passif', 'échelle', 'stratégie');
+            analysis.description = 'Sujet business et monétisation';
+        } else if (lowerTopic.includes('santé') || lowerTopic.includes('fitness') || lowerTopic.includes('corps')) {
+            analysis.category = 'health';
+            analysis.powerWords.push('transformation', 'santé', 'énergie', 'corps', 'vie');
+            analysis.description = 'Sujet bien-être et santé';
+        } else {
+            analysis.powerWords.push('secret', 'méthode', 'technique', 'astuce', 'erreur');
+            analysis.description = 'Sujet général à fort potentiel viral';
+        }
 
-Catégorie psychologique : ${category.display_name}
-Principe : ${category.psychological_principle}
+        return analysis;
+    }
 
-Exemples de cette catégorie :
-${category.examples.slice(0, 2).map((ex: string) => `- "${ex}"`).join('\n')}
+    /**
+     * Get platform-specific specifications
+     */
+    private getPlatformSpecifications(platform: string) {
+        const specs = {
+            youtube: {
+                name: 'YouTube',
+                format: 'Vidéo 8-15 secondes d\'intro',
+                hookLength: '8-12',
+                style: 'Narratif, visuel fort',
+                constraints: '✅ Doit inciter au clic "Learn More"'
+            },
+            tiktok: {
+                name: 'TikTok',
+                format: 'Vidéo verticale 3-5 secondes',
+                hookLength: '6-10',
+                style: 'Rapide, punchy, musical',
+                constraints: '✅ Doit créer curiosité immédiate'
+            },
+            instagram: {
+                name: 'Instagram',
+                format: 'Post/Reel 3-8 secondes',
+                hookLength: '7-11',
+                style: 'Visuel, émotionnel',
+                constraints: '✅ Doit inciter au swipe up ou save'
+            },
+            linkedin: {
+                name: 'LinkedIn',
+                format: 'Publication professionnelle',
+                hookLength: '10-15',
+                style: 'Expertise, valeur ajoutée',
+                constraints: '✅ Doit démontrer autorité'
+            }
+        };
 
-RÈGLES IMPORTANTES :
-- Chaque accroche doit faire 8-15 mots maximum
-- Doit commencer par la technique psychologique appropriée
-- Optimisée pour ${platformContext}
-- Doit créer un besoin immédiat de continuer à regarder/lire
-- Utilise des chiffres, questions, ou comparaisons quand approprié
-- Ton : Engageant, mystérieux, ou urgent selon la catégorie
+        return specs[platform as keyof typeof specs] || specs.youtube;
+    }
 
-Génère 2 accroches parfaites :`;
+    /**
+     * Get specific techniques for each psychological category
+     */
+    private getCategoryTechniques(categoryName: string, topicAnalysis: any): string {
+        const techniques = {
+            curiosity: `• Pose une question mystère : "Savez-vous pourquoi...?"
+• Promesse de révélation : "Je vais vous montrer..."
+• Format "Ce que personne ne dit" : "La vérité cachée sur..."
+• Hook scientifique : "Selon une étude récente..."`,
+
+            fear: `• FOMO immédiat : "Si vous ne faites pas ça maintenant..."
+• Risque identifié : "Le danger que vous ignorez"
+• Urgence temporelle : "Il vous reste X jours pour..."
+• Conséquence grave : "Sans ça, vous risquez de..."`,
+
+            gain: `• Bénéfice quantifiable : "Gagnez X% en Y temps"
+• Transformation promise : "Passez de A à Z"
+• Économie réalisée : "Économisez X€ par mois"
+• Avantage concurrentiel : "Ce que les autres n'ont pas"`,
+
+            authority: `• Expertise démontrée : "Avec 10 ans d'expérience..."
+• Résultats concrets : "J'ai aidé X personnes à..."
+• Méthode exclusive : "Ma méthode unique"
+• Validation externe : "Recommandé par des experts"`,
+
+            social_proof: `• Chiffres impressionnants : "X personnes ont déjà..."
+• Témoignages : "Voici ce qu'ils disent"
+• Comparaison sociale : "Pourquoi eux réussissent et pas vous"
+• Communauté : "Rejoignez les X qui ont réussi"`,
+
+            contrast: `• Avant/après : "Avant : pauvre → Après : riche"
+• Erreur/correction : "Erreur courante vs Solution"
+• Lent/rapide : "Méthode lente vs Ma méthode rapide"
+• Médiocre/excellent : "Ce que font les autres vs Ce que je fais"`,
+
+            question: `• Question douleur : "Êtes-vous fatigué de...?"
+• Question aspiration : "Rêvez-vous de...?"
+• Question curiosité : "Savez-vous comment...?"
+• Question urgence : "Pourquoi attendre plus longtemps?"`,
+
+            storytelling: `• Héros ordinaire : "J'étais comme vous..."
+• Problème universel : "Tout le monde vit ça"
+• Découverte étonnante : "Et puis j'ai découvert..."
+• Résolution heureuse : "Maintenant je vis ça"`
+        };
+
+        return techniques[categoryName as keyof typeof techniques] || techniques.curiosity;
+    }
+
+    /**
+     * Get appropriate tone for each category
+     */
+    private getCategoryTone(categoryName: string): string {
+        const tones = {
+            curiosity: 'Mystérieux et intrigant',
+            fear: 'Urgent et alarmant',
+            gain: 'Enthousiaste et motivant',
+            authority: 'Confiance et expertise',
+            social_proof: 'Social et inclusif',
+            contrast: 'Révolutionnaire et disruptif',
+            question: 'Empathique et engageant',
+            storytelling: 'Authentique et relatable'
+        };
+
+        return tones[categoryName as keyof typeof tones] || 'Engageant et viral';
     }
 
     /**
@@ -258,31 +406,80 @@ Génère 2 accroches parfaites :`;
     }
 
     /**
-     * Calculate expected performance score for a hook
+     * Calculate enhanced performance score for a hook
      */
-    private calculateHookScore(hookText: string, category: string, platform: string): number {
+    private calculateHookScore(hookText: string, category: string, platform: string, topicAnalysis?: any): number {
         let score = 50; // Base score
 
-        // Length scoring (8-15 words is ideal)
+        // Length scoring optimized per platform
         const wordCount = hookText.split(/\s+/).length;
-        if (wordCount >= 8 && wordCount <= 15) score += 15;
-        else if (wordCount < 8) score -= 10;
+        const platformSpecs = this.getPlatformSpecifications(platform);
+
+        if (platform === 'tiktok' && wordCount <= 8) score += 20;
+        else if (platform === 'youtube' && wordCount >= 8 && wordCount <= 12) score += 15;
+        else if (platform === 'instagram' && wordCount >= 7 && wordCount <= 11) score += 15;
+        else if (platform === 'linkedin' && wordCount >= 10 && wordCount <= 15) score += 15;
+        else if (wordCount >= 8 && wordCount <= 15) score += 10;
+        else score -= 5;
+
+        // Psychological triggers scoring
+        const triggers = {
+            curiosity: ['secret', 'mystère', 'saviez-vous', 'incroyable', 'jamais'],
+            fear: ['attention', 'danger', 'risque', 'avant qu\'il ne soit', 'dernier'],
+            gain: ['gagnez', 'découvrez', 'apprenez', 'maîtrisez', 'devenez'],
+            authority: ['expert', 'années', 'prouvé', 'méthode', 'scientifique'],
+            social_proof: ['personnes', 'déjà', 'recommandent', 'succès', 'résultats'],
+            contrast: ['avant', 'après', 'différence', 'erreur', 'solution'],
+            question: ['êtes-vous', 'savez-vous', 'pourquoi', 'comment', 'quand'],
+            storytelling: ['histoire', 'vraie', 'comme vous', 'découvert', 'changé']
+        };
+
+        const categoryTriggers = triggers[category as keyof typeof triggers] || [];
+        let triggerCount = 0;
+        categoryTriggers.forEach(trigger => {
+            if (hookText.toLowerCase().includes(trigger)) triggerCount++;
+        });
+
+        if (triggerCount >= 2) score += 15;
+        else if (triggerCount === 1) score += 8;
+
+        // Power words from topic analysis
+        if (topicAnalysis?.powerWords) {
+            const powerWordMatches = topicAnalysis.powerWords.filter((word: string) =>
+                hookText.toLowerCase().includes(word.toLowerCase())
+            ).length;
+            score += powerWordMatches * 3;
+        }
 
         // Question marks for engagement
-        if (hookText.includes('?')) score += 10;
+        if (hookText.includes('?')) score += 12;
 
-        // Numbers for specificity
-        if (/\d+/.test(hookText)) score += 5;
+        // Numbers and metrics
+        if (/\d+/.test(hookText)) score += 8;
 
-        // Platform-specific optimizations
-        if (platform === 'tiktok' && hookText.length < 50) score += 5;
+        // Emotional punctuation
+        if (hookText.includes('!')) score += 5;
+
+        // Category-specific performance bonuses
+        const performanceMultipliers = {
+            curiosity: 1.2,    // Highest performing
+            fear: 1.15,        // Very effective
+            gain: 1.1,         // Good performer
+            social_proof: 1.08, // Consistent
+            authority: 1.05,   // Steady
+            contrast: 1.03,    // Decent
+            question: 1.02,    // Basic
+            storytelling: 1.0  // Baseline
+        };
+
+        score *= performanceMultipliers[category as keyof typeof performanceMultipliers] || 1.0;
+
+        // Platform-specific bonuses
+        if (platform === 'tiktok' && triggerCount >= 1) score += 8;
         if (platform === 'youtube' && wordCount <= 12) score += 5;
+        if (platform === 'linkedin' && category === 'authority') score += 10;
 
-        // Category-specific bonuses
-        const highPerformingCategories = ['curiosity', 'fear', 'gain'];
-        if (highPerformingCategories.includes(category)) score += 10;
-
-        return Math.min(100, Math.max(0, score));
+        return Math.min(100, Math.max(0, Math.round(score)));
     }
 
     /**
@@ -411,6 +608,196 @@ Génère 2 accroches parfaites :`;
         }
 
         return data || [];
+    }
+
+    /**
+     * Get top performing hooks from user's library for learning
+     */
+    async getTopPerformingHooks(userId: string, category?: string, platform?: string, limit = 10) {
+        let query = supabase
+            .from('hook_library')
+            .select(`
+                *,
+                hook_categories (
+                    name,
+                    display_name,
+                    psychological_principle
+                )
+            `)
+            .eq('user_id', userId)
+            .eq('is_favorite', true)
+            .order('performance_score', { ascending: false })
+            .order('usage_count', { ascending: false })
+            .limit(limit);
+
+        if (category) {
+            query = query.eq('category_id', category);
+        }
+
+        if (platform) {
+            query = query.eq('platform', platform);
+        }
+
+        const { data, error } = await query;
+
+        if (error) {
+            console.error('Error fetching top hooks:', error);
+            return [];
+        }
+
+        return data || [];
+    }
+
+    /**
+     * Get category performance statistics
+     */
+    async getCategoryPerformanceStats(userId: string) {
+        const { data, error } = await supabase
+            .from('content_hooks')
+            .select(`
+                category_id,
+                generated_hooks,
+                hook_categories (
+                    name,
+                    display_name
+                )
+            `)
+            .eq('user_id', userId)
+            .not('generated_hooks', 'is', null);
+
+        if (error) {
+            console.error('Error fetching performance stats:', error);
+            return {};
+        }
+
+        // Calculate average scores per category
+        const stats: Record<string, { total: number, count: number, average: number }> = {};
+
+        data?.forEach(hook => {
+            const categoryId = hook.category_id;
+            const hooks = hook.generated_hooks || [];
+
+            hooks.forEach((h: GeneratedHook) => {
+                if (!stats[categoryId]) {
+                    stats[categoryId] = { total: 0, count: 0, average: 0 };
+                }
+                stats[categoryId].total += h.score;
+                stats[categoryId].count += 1;
+            });
+        });
+
+        // Calculate averages
+        Object.keys(stats).forEach(categoryId => {
+            stats[categoryId].average = stats[categoryId].total / stats[categoryId].count;
+        });
+
+        return stats;
+    }
+
+    /**
+     * Learn from successful hooks and improve future generations
+     */
+    async learnFromSuccessfulHooks(userId: string): Promise<Record<string, any>> {
+        const topHooks = await this.getTopPerformingHooks(userId, undefined, undefined, 20);
+        const categoryStats = await this.getCategoryPerformanceStats(userId);
+
+        // Extract patterns from successful hooks
+        const patterns = {
+            successfulWords: [] as string[],
+            successfulStructures: [] as string[],
+            categoryPreferences: categoryStats,
+            platformPerformance: {} as Record<string, number>
+        };
+
+        // Analyze successful hooks for patterns
+        topHooks.forEach(hook => {
+            const words = hook.hook_text.toLowerCase().split(/\s+/);
+            patterns.successfulWords.push(...words.filter((word: string) => word.length > 3));
+
+            // Analyze structure patterns
+            if (hook.hook_text.includes('?')) {
+                patterns.successfulStructures.push('question');
+            }
+            if (/\d+/.test(hook.hook_text)) {
+                patterns.successfulStructures.push('numbers');
+            }
+            if (hook.hook_text.includes('!')) {
+                patterns.successfulStructures.push('exclamation');
+            }
+        });
+
+        // Remove duplicates and sort by frequency
+        const wordFreq = patterns.successfulWords.reduce((acc, word) => {
+            acc[word] = (acc[word] || 0) + 1;
+            return acc;
+        }, {} as Record<string, number>);
+
+        patterns.successfulWords = Object.entries(wordFreq)
+            .sort(([, a], [, b]) => b - a)
+            .slice(0, 10)
+            .map(([word]) => word);
+
+        return patterns;
+    }
+
+    /**
+     * Save hook to user's personal library
+     */
+    async saveHookToLibrary(
+        userId: string,
+        hook: GeneratedHook,
+        topic: string,
+        tags: string[] = []
+    ) {
+        const { data, error } = await supabase
+            .from('hook_library')
+            .insert({
+                user_id: userId,
+                hook_text: hook.text,
+                category_id: null, // We'll need to get this from the hook category
+                topic: topic,
+                platform: null, // We'll add this later
+                tags: tags,
+                performance_score: hook.score
+            })
+            .select()
+            .single();
+
+        if (error) {
+            console.error('Error saving hook to library:', error);
+            throw new Error('Failed to save hook to library');
+        }
+
+        return data;
+    }
+
+    /**
+     * Export hooks as formatted text or JSON
+     */
+    exportHooks(hooks: GeneratedHook[], format: 'text' | 'json' | 'csv' = 'text') {
+        switch (format) {
+            case 'json':
+                return JSON.stringify(hooks, null, 2);
+
+            case 'csv':
+                const headers = ['Category', 'Hook Text', 'Score', 'Platform Specific'];
+                const rows = hooks.map(hook => [
+                    hook.category_name,
+                    `"${hook.text}"`,
+                    hook.score,
+                    hook.platform_specific ? 'Yes' : 'No'
+                ]);
+                return [headers, ...rows].map(row => row.join(',')).join('\n');
+
+            case 'text':
+            default:
+                return hooks
+                    .sort((a, b) => b.score - a.score)
+                    .map((hook, index) =>
+                        `${index + 1}. [${hook.category_name}] "${hook.text}" (Score: ${hook.score}/100)${hook.platform_specific ? ' - Plateforme spécifique' : ''}`
+                    )
+                    .join('\n\n');
+        }
     }
 }
 

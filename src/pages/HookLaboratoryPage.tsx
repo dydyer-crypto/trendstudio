@@ -21,7 +21,12 @@ import {
     Copy,
     Save,
     Play,
-    Target
+    Target,
+    Download,
+    Star,
+    TrendingDown,
+    TrendingUp as TrendingUpIcon,
+    BarChart
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { useAuth } from '@/contexts/AuthContext';
@@ -206,6 +211,30 @@ export default function HookLaboratoryPage() {
         setCategory('all');
     };
 
+    const handleExportHooks = (format: 'text' | 'json' | 'csv' = 'text') => {
+        if (generatedHooks.length === 0) {
+            toast.error('Aucun hook à exporter');
+            return;
+        }
+
+        const exportedData = hookGeneratorService.exportHooks(generatedHooks, format);
+
+        // Create and download file
+        const blob = new Blob([exportedData], {
+            type: format === 'json' ? 'application/json' : 'text/plain'
+        });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `hooks_${topic.replace(/[^a-zA-Z0-9]/g, '_')}_${new Date().toISOString().split('T')[0]}.${format === 'json' ? 'json' : 'txt'}`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+
+        toast.success(`Hooks exportés en format ${format.toUpperCase()} !`);
+    };
+
     return (
         <div className="container mx-auto p-6 space-y-8 max-w-7xl">
             <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
@@ -339,15 +368,34 @@ export default function HookLaboratoryPage() {
                     <Card className="border-2 border-muted shadow-2xl">
                         <CardHeader>
                             <div className="flex justify-between items-center">
-                                <CardTitle className="flex items-center gap-2">
-                                    <Target className="h-5 w-5 text-primary" />
-                                    Hooks Générés
+                                <div className="flex items-center gap-4">
+                                    <CardTitle className="flex items-center gap-2">
+                                        <Target className="h-5 w-5 text-primary" />
+                                        Hooks Générés
+                                        {generatedHooks.length > 0 && (
+                                            <Badge variant="secondary" className="ml-2">
+                                                {generatedHooks.length} hooks
+                                            </Badge>
+                                        )}
+                                    </CardTitle>
                                     {generatedHooks.length > 0 && (
-                                        <Badge variant="secondary" className="ml-2">
-                                            {generatedHooks.length} hooks
-                                        </Badge>
+                                        <div className="flex items-center gap-2 text-sm">
+                                            <div className="flex items-center gap-1">
+                                                <TrendingUpIcon size={14} className="text-green-500" />
+                                                <span>Score moyen: {Math.round(generatedHooks.reduce((sum, h) => sum + h.score, 0) / generatedHooks.length)}%</span>
+                                            </div>
+                                            <Button
+                                                variant="outline"
+                                                size="sm"
+                                                onClick={() => handleExportHooks('text')}
+                                                className="h-8"
+                                            >
+                                                <Download size={14} className="mr-1" />
+                                                Exporter
+                                            </Button>
+                                        </div>
                                     )}
-                                </CardTitle>
+                                </div>
                                 {savedCount > 0 && (
                                     <Badge variant="outline" className="gap-1">
                                         <Save size={12} /> {savedCount} sauvegardés
