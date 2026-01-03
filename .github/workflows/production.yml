@@ -1,0 +1,122 @@
+name: 🚀 Production Deployment
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  test:
+    name: 🧪 Run Tests
+    runs-on: ubuntu-latest
+    steps:
+      - name: 📥 Checkout code
+        uses: actions/checkout@v4
+
+      - name: 🟢 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+
+      - name: 📦 Install dependencies
+        run: npm ci
+
+      - name: 🧹 Run linter
+        run: npm run lint
+
+      - name: 🧪 Run tests
+        run: npm run test
+        env:
+          CI: true
+
+      - name: 🏗️ Build production
+        run: npm run build
+
+      - name: 📊 Upload build artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: build-files
+          path: dist/
+          retention-days: 7
+
+  security:
+    name: 🔒 Security Scan
+    runs-on: ubuntu-latest
+    steps:
+      - name: 📥 Checkout code
+        uses: actions/checkout@v4
+
+      - name: 🔍 Run security audit
+        run: npm audit --audit-level high
+
+      - name: 🛡️ CodeQL Analysis
+        uses: github/codeql-action/init@v2
+        with:
+          languages: javascript-typescript
+
+      - name: 🔍 Perform CodeQL Analysis
+        uses: github/codeql-action/analyze@v2
+
+  deploy-staging:
+    name: 🎭 Deploy to Staging
+    needs: [test, security]
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    runs-on: ubuntu-latest
+    environment: staging
+    steps:
+      - name: 📥 Checkout code
+        uses: actions/checkout@v4
+
+      - name: 🚀 Deploy to Vercel (Staging)
+        uses: amondnet/vercel-action@v25
+        with:
+          vercel-token: ${{ secrets.VERCEL_TOKEN }}
+          vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
+          vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID }}
+          vercel-args: '--prod=false'
+          working-directory: ./
+
+  deploy-production:
+    name: 🚀 Deploy to Production
+    needs: [deploy-staging]
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    runs-on: ubuntu-latest
+    environment: production
+    steps:
+      - name: 📥 Checkout code
+        uses: actions/checkout@v4
+
+      - name: 🚀 Deploy to Vercel (Production)
+        uses: amondnet/vercel-action@v25
+        with:
+          vercel-token: ${{ secrets.VERCEL_TOKEN }}
+          vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
+          vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID }}
+          vercel-args: '--prod=true'
+          working-directory: ./
+
+      - name: 📢 Notify deployment success
+        run: |
+          curl -X POST -H 'Content-type: application/json' \
+          --data '{"text":"🚀 TrendStudio deployed to production!"}' \
+          ${{ secrets.SLACK_WEBHOOK_URL }}
+
+  health-check:
+    name: ❤️ Health Check
+    needs: [deploy-production]
+    runs-on: ubuntu-latest
+    steps:
+      - name: 🩺 Check production health
+        run: |
+          # Wait for deployment to be ready
+          sleep 60
+
+          # Check if app is responding
+          if curl -f -s ${{ secrets.PRODUCTION_URL }}/health > /dev/null; then
+            echo "✅ Production is healthy"
+          else
+            echo "❌ Production health check failed"
+            exit 1
+          fi

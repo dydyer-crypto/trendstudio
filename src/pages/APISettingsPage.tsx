@@ -2,7 +2,9 @@
 import { APIKeyManager } from "@/components/settings/APIKeyManager";
 import { WebhookConfig } from "@/components/settings/WebhookConfig";
 import { SocialMediaConnections } from "@/components/settings/SocialMediaConnections";
+import { WordPressConnections } from "@/components/settings/WordPressConnections";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { useState, useEffect } from "react";
 import { supabase } from "@/db/supabase";
@@ -100,6 +102,18 @@ export default function APISettingsPage() {
                 </CardHeader>
                 <CardContent>
                     <SocialMediaConnections />
+                </CardContent>
+            </Card>
+
+            <Card>
+                <CardHeader>
+                    <CardTitle>Sites WordPress</CardTitle>
+                    <CardDescription>
+                        Connectez vos sites WordPress pour exporter vos contenus IA directement en articles ou pages.
+                    </CardDescription>
+                </CardHeader>
+                <CardContent>
+                    <WordPressConnections />
                 </CardContent>
             </Card>
         </div>

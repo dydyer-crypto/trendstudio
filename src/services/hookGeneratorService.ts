@@ -1,4 +1,6 @@
 import { supabase } from '@/db/supabase';
+import { aiService } from './aiService';
+import { brandKitService } from './brandKitService';
 
 export interface HookCategory {
     id: string;
@@ -49,6 +51,8 @@ export interface HookGenerationRequest {
     platform: string;
     category?: string; // Specific category or 'all'
     count?: number; // Number of hooks to generate per category
+    brandKit?: any; // Brand kit for personalized hooks
+    userId?: string; // User ID to fetch brand kit if not provided
 }
 
 export class HookGeneratorService {
@@ -85,6 +89,16 @@ export class HookGeneratorService {
      * Generate hooks for a given topic
      */
     async generateHooks(request: HookGenerationRequest): Promise<GeneratedHook[]> {
+        // Get brand kit if not provided but userId is available
+        let brandKit = request.brandKit;
+        if (!brandKit && request.userId) {
+            try {
+                brandKit = await brandKitService.getActiveBrandKit(request.userId);
+            } catch (error) {
+                console.warn('Could not fetch brand kit:', error);
+            }
+        }
+
         const categories = request.category && request.category !== 'all'
             ? [request.category]
             : ['curiosity', 'fear', 'gain', 'authority', 'social_proof', 'contrast', 'question', 'storytelling'];
@@ -115,7 +129,8 @@ export class HookGeneratorService {
                     categoryName,
                     category,
                     hooksPerCategory,
-                    request
+                    request,
+                    brandKit
                 );
                 hooks.push(...categoryHooks);
             } catch (error) {
@@ -138,13 +153,12 @@ export class HookGeneratorService {
         categoryName: string,
         category: any,
         count: number,
-        request: HookGenerationRequest
+        request: HookGenerationRequest,
+        brandKit?: any
     ): Promise<GeneratedHook[]> {
-        const prompt = this.buildHookPrompt(topic, targetAudience, platform, category);
-
         try {
             // Call AI service to generate hooks
-            const aiResponse = await this.callAIGeneration(prompt, count);
+            const aiResponse = await this.callAIGeneration(this.buildHookPrompt(topic, targetAudience, platform, category, brandKit), count);
 
             return aiResponse.hooks.map((hookText: string, index: number) => {
                 const topicAnalysis = this.analyzeTopic(request.topic);
@@ -174,11 +188,15 @@ export class HookGeneratorService {
         topic: string,
         targetAudience: string | undefined,
         platform: string,
-        category: any
+        category: any,
+        brandKit?: any
     ): string {
         const topicAnalysis = this.analyzeTopic(topic);
         const audience = targetAudience ? ` pour ${targetAudience}` : '';
         const platformSpecs = this.getPlatformSpecifications(platform);
+
+        // Brand kit integration
+        const brandContext = brandKit ? this.buildBrandContext(brandKit) : '';
 
         return `Tu es un expert en copywriting viral avec 10 ans d'expérience. Génère des hooks ultra-performants.
 
@@ -189,6 +207,7 @@ CONTEXTE :
 - Plateforme : ${platformSpecs.name} (${platformSpecs.format})
 - Longueur optimale : ${platformSpecs.hookLength} mots
 - Style de plateforme : ${platformSpecs.style}
+${brandContext}
 
 CATÉGORIE PSYCHOLOGIQUE : ${category.display_name}
 Principe fondamental : ${category.psychological_principle}
@@ -357,51 +376,79 @@ Génère 3 accroches exceptionnelles classées par potentiel viral :`;
     }
 
     /**
+     * Build brand context for personalized hooks
+     */
+    private buildBrandContext(brandKit: any): string {
+        if (!brandKit) return '';
+
+        const brandElements = [];
+
+        if (brandKit.name) {
+            brandElements.push(`- Marque : ${brandKit.name}`);
+        }
+
+        if (brandKit.brand_voice?.tone?.length > 0) {
+            brandElements.push(`- Ton de voix : ${brandKit.brand_voice.tone.join(', ')}`);
+        }
+
+        if (brandKit.brand_voice?.style?.length > 0) {
+            brandElements.push(`- Style : ${brandKit.brand_voice.style.join(', ')}`);
+        }
+
+        if (brandKit.brand_voice?.keywords?.length > 0) {
+            brandElements.push(`- Mots-clés de marque : ${brandKit.brand_voice.keywords.join(', ')}`);
+        }
+
+        if (brandElements.length === 0) return '';
+
+        return `\nCONTEXTE DE MARQUE :\n${brandElements.join('\n')}\n- Adaptez le ton et le style des hooks à cette identité de marque`;
+    }
+
+    /**
      * Call AI service for hook generation
      */
     private async callAIGeneration(prompt: string, count: number): Promise<{ hooks: string[] }> {
-        // TODO: Integrate with actual AI service (Gemini, OpenAI, etc.)
-        // For now, return mock data
-        await new Promise(resolve => setTimeout(resolve, 1000)); // Simulate API call
+        try {
+            const response = await aiService.generateText({
+                prompt: `${prompt}\n\nGénère exactement ${count} accroches séparées par des sauts de ligne. Chaque accroche doit être concise et percutante.`,
+                model: 'deepseek-chat',
+                temperature: 0.8,
+                maxTokens: 500,
+                systemPrompt: 'Tu es un expert en copywriting viral spécialisé dans la création de hooks pour les réseaux sociaux. Tu génères des accroches qui captent l\'attention en 3 secondes.'
+            });
 
-        // Mock AI response based on category
-        const mockResponses = {
-            curiosity: [
-                "Ce secret va révolutionner votre façon de créer",
-                "Vous ne croirez jamais cette découverte incroyable"
-            ],
-            fear: [
-                "Si vous ne changez pas maintenant, il sera trop tard",
-                "Le risque que vous prenez sans le savoir"
-            ],
-            gain: [
-                "Gagnez 10x plus de vues en seulement 30 jours",
-                "Le secret pour doubler vos revenus cette année"
-            ],
-            authority: [
-                "En tant qu'expert avec 500k abonnés, voici la vérité",
-                "Après 10 ans dans l'industrie, ce que j'ai découvert"
-            ],
-            social_proof: [
-                "Comment j'ai aidé 10k créateurs à exploser leur audience",
-                "Ce que font tous les top créateurs que personne ne dit"
-            ],
-            contrast: [
-                "Avant : 100 vues. Après : 10k vues. Voici comment",
-                "La différence entre amateur et professionnel"
-            ],
-            question: [
-                "Pourquoi 99% des créateurs échouent-ils ?",
-                "Savez-vous vraiment optimiser vos contenus ?"
-            ],
-            storytelling: [
-                "Il était une fois un créateur comme vous...",
-                "L'histoire vraie qui a changé ma carrière pour toujours"
-            ]
-        };
+            // Parse the response to extract individual hooks
+            const hooks = response.text
+                .split('\n')
+                .map(line => line.trim())
+                .filter(line => line.length > 10 && !line.startsWith('-') && !line.startsWith('*'))
+                .slice(0, count);
+
+            return { hooks };
+        } catch (error) {
+            console.error('AI generation failed, using fallback:', error);
+            // Fallback to template-based generation
+            return this.generateFallbackHooksArray(prompt, count);
+        }
+    }
+
+    /**
+     * Generate fallback hooks array when AI fails
+     */
+    private generateFallbackHooksArray(prompt: string, count: number): { hooks: string[] } {
+        const fallbackHooks = [
+            "Ce secret va révolutionner votre façon de créer",
+            "Vous ne croirez jamais ce qui s'est passé",
+            "Si vous ne changez pas maintenant, il sera trop tard",
+            "Le danger que vous prenez sans le savoir",
+            "Gagnez 10x plus de vues en seulement 30 jours",
+            "Le secret pour doubler vos revenus cette année",
+            "En tant qu'expert avec 500k abonnés, voici la vérité",
+            "Après 10 ans dans l'industrie, ce que j'ai découvert"
+        ];
 
         return {
-            hooks: mockResponses.curiosity // Default fallback
+            hooks: fallbackHooks.slice(0, count)
         };
     }
 

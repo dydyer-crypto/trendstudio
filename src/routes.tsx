@@ -29,6 +29,7 @@ import TutorialsPage from './pages/TutorialsPage';
 import CompetitorPage from './pages/CompetitorPage';
 import BrandStudioPage from './pages/BrandStudioPage';
 import HookLaboratoryPage from './pages/HookLaboratoryPage';
+import ReplyAssistantPage from './pages/ReplyAssistantPage';
 import type { ReactNode } from 'react';
 
 interface RouteConfig {
@@ -196,7 +197,12 @@ const routes: RouteConfig[] = [
   {
     name: 'Laboratoire de Hooks',
     path: '/hooks',
-    element: <HookLaboratoryPage />
+    element: <HookLaboratoryPage />,
+  },
+  {
+    name: 'IA Reply Assistant',
+    path: '/reply-assistant',
+    element: <ReplyAssistantPage />
   }
 ];
 
